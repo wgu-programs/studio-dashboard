@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { Profile } from "@/integrations/supabase/types";
+import { type Profile as ProfileType } from "@/integrations/supabase/types";
 
 const Profile = () => {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [uploading, setUploading] = useState(false);
