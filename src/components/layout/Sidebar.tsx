@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../theme/theme-provider";
 import { supabase } from "@/integrations/supabase/client";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
 import { Auth } from "@supabase/auth-ui-react";
@@ -90,6 +90,13 @@ const Sidebar = () => {
     { to: "/tests", icon: CheckSquare, label: "Tests" },
   ];
 
+  const getInitials = () => {
+    if (!profile) return "";
+    const firstInitial = profile.first_name?.[0] || "";
+    const lastInitial = profile.last_name?.[0] || "";
+    return (firstInitial + lastInitial).toUpperCase();
+  };
+
   return (
     <div
       className={`bg-white dark:bg-sidebar-background h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
@@ -160,10 +167,8 @@ const Sidebar = () => {
               }
             >
               <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                  {profile.first_name?.[0]}
-                  {profile.last_name?.[0]}
-                </AvatarFallback>
+                <AvatarImage src={profile.avatar_url} />
+                <AvatarFallback>{getInitials()}</AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <span>
