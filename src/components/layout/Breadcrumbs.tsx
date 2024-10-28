@@ -27,7 +27,7 @@ export const Breadcrumbs = () => {
   if (location.pathname === '/') return null;
 
   return (
-    <Breadcrumb className="mb-6">
+    <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
