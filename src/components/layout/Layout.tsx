@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { Breadcrumbs } from "./Breadcrumbs";
+import { PageHeader } from "./PageHeader";
 
 const Layout = () => {
   return (
@@ -8,11 +8,8 @@ const Layout = () => {
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="p-8">
-          <div className="space-y-4">
-            <Outlet context={{ PageTitle: ({ children }: { children: React.ReactNode }) => (
-              <h1 className="text-4xl font-bold">{children}</h1>
-            )}} />
-            <Breadcrumbs />
+          <div className="space-y-6">
+            <Outlet context={{ PageTitle: PageHeader }} />
           </div>
         </div>
       </main>
