@@ -3,13 +3,11 @@ import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateRunName } from "@/utils/nameGenerator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
+import { CrawlerDetailsCard } from "@/components/crawlers/CrawlerDetailsCard";
 
 interface Crawler {
   crawler_id: string;
@@ -19,6 +17,7 @@ interface Crawler {
   project: {
     name: string;
   } | null;
+  start_urls: string[] | null;
 }
 
 const CrawlerDetails = () => {
@@ -153,54 +152,17 @@ const CrawlerDetails = () => {
         </div>
       </PageTitle>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Crawler Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isEditing ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSave}>Save</Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div>
-                <Label>Project</Label>
-                <p className="text-sm text-muted-foreground">
-                  {crawler.project?.name || "No project assigned"}
-                </p>
-              </div>
-              <div>
-                <Label>Description</Label>
-                <p className="text-sm text-muted-foreground">
-                  {crawler.description || "No description"}
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <CrawlerDetailsCard
+        crawler={crawler}
+        isEditing={isEditing}
+        name={name}
+        description={description}
+        setName={setName}
+        setDescription={setDescription}
+        onSave={handleSave}
+        onCancel={() => setIsEditing(false)}
+        onUpdate={fetchCrawler}
+      />
 
       <Card>
         <CardHeader>
