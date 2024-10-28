@@ -12,6 +12,7 @@ import CrawlerDetails from "@/pages/CrawlerDetails";
 import Runs from "@/pages/Runs";
 import RunDetails from "@/pages/RunDetails";
 import Personas from "@/pages/Personas";
+import PersonaDetails from "@/pages/PersonaDetails";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { WorkspaceProvider } from "@/context/WorkspaceContext";
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "/personas",
         element: <Personas />,
+      },
+      {
+        path: "/personas/:personaId",
+        element: <PersonaDetails />,
       },
     ],
   },
