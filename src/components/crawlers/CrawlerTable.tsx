@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pause, Play, Square, Archive } from "lucide-react";
+import { Pause, Play, Square, Archive, Play as PlayIcon } from "lucide-react";
 
 interface CrawlerTableProps {
   crawlers: any[];
@@ -19,6 +20,7 @@ interface CrawlerTableProps {
 }
 
 export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: CrawlerTableProps) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleRunAction = async (runId: string, action: 'pause' | 'stop') => {
@@ -50,25 +52,31 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
     }
   };
 
-  const handleArchiveRun = async (runId: string) => {
+  const handleStartCrawler = async (crawler: any) => {
     try {
       const { error } = await supabase
-        .from('runs')
-        .update({ archived: true })
-        .eq('run_id', runId);
+        .from("runs")
+        .insert([
+          {
+            crawler_id: crawler.crawler_id,
+            status: "queued",
+            started_at: new Date().toISOString(),
+            name: `Run of ${crawler.name || "Unnamed Crawler"}`,
+          },
+        ]);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Run archived successfully",
+        description: "Crawler started successfully",
       });
 
       onRunStatusChange();
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to archive run",
+        description: "Failed to start crawler",
         variant: "destructive",
       });
     }
@@ -80,6 +88,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Project</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Latest Run</TableHead>
@@ -95,9 +104,16 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
               )[0];
 
             return (
-              <TableRow key={crawler.crawler_id}>
+              <TableRow 
+                key={crawler.crawler_id}
+                className="cursor-pointer"
+                onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
+              >
                 <TableCell className="font-medium">
                   {crawler.name || "Unnamed Crawler"}
+                </TableCell>
+                <TableCell>
+                  {crawler.project?.name || "No project"}
                 </TableCell>
                 <TableCell>{crawler.description || "No description"}</TableCell>
                 <TableCell>{crawler.status}</TableCell>
@@ -113,39 +129,41 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                     "No runs"
                   )}
                 </TableCell>
-                <TableCell>
-                  {latestRun && latestRun.status !== 'stopped' && (
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleRunAction(latestRun.run_id, 'pause')}
-                      >
-                        {latestRun.status === 'paused' ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleRunAction(latestRun.run_id, 'stop')}
-                      >
-                        <Square className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleArchiveRun(latestRun.run_id)}
-                      >
-                        <Archive className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleStartCrawler(crawler)}
+                    >
+                      <PlayIcon className="h-4 w-4" />
+                    </Button>
+                    {latestRun && latestRun.status !== 'stopped' && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleRunAction(latestRun.run_id, 'pause')}
+                        >
+                          {latestRun.status === 'paused' ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleRunAction(latestRun.run_id, 'stop')}
+                        >
+                          <Square className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             );
           })}
           {crawlers.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
                 No crawlers found
               </TableCell>
             </TableRow>

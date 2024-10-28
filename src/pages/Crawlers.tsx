@@ -18,7 +18,8 @@ const Crawlers = () => {
         .from("crawler")
         .select(`
           *,
-          runs (*)
+          runs (*),
+          project:projects(name)
         `)
         .order("created_at", { ascending: false });
 
