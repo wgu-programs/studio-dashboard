@@ -27,30 +27,32 @@ export const Breadcrumbs = () => {
   if (location.pathname === '/') return null;
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        
-        {breadcrumbs.map((breadcrumb, index) => (
-          <BreadcrumbItem key={breadcrumb.url}>
-            {breadcrumb.isLast ? (
-              <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
-            ) : (
-              <>
-                <BreadcrumbLink asChild>
-                  <Link to={breadcrumb.url}>{breadcrumb.label}</Link>
-                </BreadcrumbLink>
-                <BreadcrumbSeparator />
-              </>
-            )}
+    <div className="mb-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Home</Link>
+            </BreadcrumbLink>
           </BreadcrumbItem>
-        ))}
-      </BreadcrumbList>
-    </Breadcrumb>
+          <BreadcrumbSeparator />
+          
+          {breadcrumbs.map((breadcrumb, index) => (
+            <BreadcrumbItem key={breadcrumb.url}>
+              {breadcrumb.isLast ? (
+                <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+              ) : (
+                <>
+                  <BreadcrumbLink asChild>
+                    <Link to={breadcrumb.url}>{breadcrumb.label}</Link>
+                  </BreadcrumbLink>
+                  <BreadcrumbSeparator />
+                </>
+              )}
+            </BreadcrumbItem>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
   );
 };
