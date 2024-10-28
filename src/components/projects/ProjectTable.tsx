@@ -17,27 +17,29 @@ interface Project {
 
 export const ProjectTable = ({ projects }: { projects: Project[] }) => {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead>Created</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {projects.map((project) => (
-          <TableRow key={project.project_id}>
-            <TableCell className="font-medium">{project.name}</TableCell>
-            <TableCell>{project.description || "No description"}</TableCell>
-            <TableCell>
-              {formatDistanceToNow(new Date(project.created_at), {
-                addSuffix: true,
-              })}
-            </TableCell>
+    <div className="border rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[200px]">Name</TableHead>
+            <TableHead className="w-[400px]">Description</TableHead>
+            <TableHead>Created</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {projects.map((project) => (
+            <TableRow key={project.project_id}>
+              <TableCell className="font-medium">{project.name}</TableCell>
+              <TableCell>{project.description || "No description"}</TableCell>
+              <TableCell>
+                {formatDistanceToNow(new Date(project.created_at), {
+                  addSuffix: true,
+                })}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };

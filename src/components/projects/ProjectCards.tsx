@@ -10,14 +10,14 @@ interface Project {
 
 export const ProjectCards = ({ projects }: { projects: Project[] }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <Card key={project.project_id}>
-          <CardHeader>
-            <CardTitle>{project.name}</CardTitle>
+        <Card key={project.project_id} className="hover:shadow-lg transition-shadow">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">{project.name}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground min-h-[3rem]">
               {project.description || "No description"}
             </p>
             <p className="text-sm text-muted-foreground">
