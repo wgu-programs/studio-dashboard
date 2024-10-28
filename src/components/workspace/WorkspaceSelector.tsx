@@ -31,89 +31,142 @@ export const WorkspaceSelector = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchWorkspaces();
-  }, []);
+    const fetchWorkspaces = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) {
+          toast({
+            title: "Error",
+            description: "Please log in to view workspaces",
+            variant: "destructive",
+          });
+          return;
+        }
 
-  const fetchWorkspaces = async () => {
-    const { data: workspaceUsers } = await supabase
-      .from("workspace_users")
-      .select(`
-        workspace_id,
-        workspaces (
-          id,
-          name,
-          description
-        )
-      `);
+        const { data: workspaceUsers, error: workspaceError } = await supabase
+          .from("workspace_users")
+          .select(`
+            workspace_id,
+            workspaces (
+              id,
+              name,
+              description
+            )
+          `)
+          .eq('user_id', session.session.user.id);
 
-    if (workspaceUsers) {
-      const workspaces = workspaceUsers.map((wu: any) => wu.workspaces);
-      setWorkspaces(workspaces);
-      if (workspaces.length > 0 && !currentWorkspace) {
-        setCurrentWorkspace(workspaces[0].id.toString());
+        if (workspaceError) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch workspaces",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (workspaceUsers) {
+          const workspaces = workspaceUsers
+            .map((wu: any) => wu.workspaces)
+            .filter(Boolean);
+          setWorkspaces(workspaces);
+          if (workspaces.length > 0 && !currentWorkspace) {
+            setCurrentWorkspace(workspaces[0].id.toString());
+          }
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch workspaces",
+          variant: "destructive",
+        });
       }
-    }
-  };
+    };
+
+    fetchWorkspaces();
+  }, [toast]);
 
   const createWorkspace = async () => {
-    if (!newWorkspace.name.trim()) {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        toast({
+          title: "Error",
+          description: "Please log in to create a workspace",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!newWorkspace.name.trim()) {
+        toast({
+          title: "Error",
+          description: "Workspace name is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create the workspace
+      const { data: workspace, error: workspaceError } = await supabase
+        .from("workspaces")
+        .insert([
+          {
+            name: newWorkspace.name,
+            description: newWorkspace.description,
+          },
+        ])
+        .select()
+        .single();
+
+      if (workspaceError) {
+        toast({
+          title: "Error",
+          description: "Failed to create workspace",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Add the creator as an owner
+      const { error: memberError } = await supabase
+        .from("workspace_users")
+        .insert([
+          {
+            workspace_id: workspace.id,
+            user_id: session.session.user.id,
+            role: "owner",
+          },
+        ]);
+
+      if (memberError) {
+        toast({
+          title: "Error",
+          description: "Failed to add user to workspace",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsOpen(false);
+      setNewWorkspace({ name: "", description: "" });
+      // Refresh the page to update workspaces
+      navigate(0);
+      
+      toast({
+        title: "Success",
+        description: "Workspace created successfully",
+      });
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Workspace name is required",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return;
     }
-
-    const { data: workspace, error: workspaceError } = await supabase
-      .from("workspaces")
-      .insert([
-        {
-          name: newWorkspace.name,
-          description: newWorkspace.description,
-        },
-      ])
-      .select()
-      .single();
-
-    if (workspaceError) {
-      toast({
-        title: "Error",
-        description: "Failed to create workspace",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { error: memberError } = await supabase.from("workspace_users").insert([
-      {
-        workspace_id: workspace.id,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        role: "owner",
-      },
-    ]);
-
-    if (memberError) {
-      toast({
-        title: "Error",
-        description: "Failed to add user to workspace",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsOpen(false);
-    setNewWorkspace({ name: "", description: "" });
-    fetchWorkspaces();
-    toast({
-      title: "Success",
-      description: "Workspace created successfully",
-    });
   };
 
   const handleWorkspaceChange = (value: string) => {
     setCurrentWorkspace(value);
-    // Refresh the current page to update data for the new workspace
     navigate(0);
   };
 
