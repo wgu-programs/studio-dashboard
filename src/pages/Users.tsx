@@ -32,14 +32,15 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
-        .select("*")
-        .ilike(
-          searchTerm ? "first_name" : "id",
-          searchTerm ? `%${searchTerm}%` : "%"
-        )
-        .order("created_at", { ascending: false });
+        .select("*");
+
+      if (searchTerm) {
+        query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setUsers(data || []);
