@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -112,41 +114,41 @@ const Sidebar = () => {
         </button>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        {links.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `sidebar-link ${isActive ? "active" : ""}`
-            }
-          >
-            <Icon className="h-5 w-5" />
-            {!collapsed && <span>{label}</span>}
-          </NavLink>
-        ))}
-      </nav>
+      {session && profile ? (
+        <>
+          <nav className="flex-1 p-4 space-y-2">
+            {links.map(({ to, icon: Icon, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `sidebar-link ${isActive ? "active" : ""}`
+                }
+              >
+                <Icon className="h-5 w-5" />
+                {!collapsed && <span>{label}</span>}
+              </NavLink>
+            ))}
+          </nav>
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-        <button
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
-        >
-          {theme === "light" ? (
-            <>
-              <Moon className="h-5 w-5" />
-              {!collapsed && <span>Dark mode</span>}
-            </>
-          ) : (
-            <>
-              <Sun className="h-5 w-5" />
-              {!collapsed && <span>Light mode</span>}
-            </>
-          )}
-        </button>
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
+            >
+              {theme === "light" ? (
+                <>
+                  <Moon className="h-5 w-5" />
+                  {!collapsed && <span>Dark mode</span>}
+                </>
+              ) : (
+                <>
+                  <Sun className="h-5 w-5" />
+                  {!collapsed && <span>Light mode</span>}
+                </>
+              )}
+            </button>
 
-        {session && profile && (
-          <>
             <NavLink
               to="/profile"
               className={({ isActive }) =>
@@ -177,9 +179,20 @@ const Sidebar = () => {
               <LogOut className="h-5 w-5" />
               {!collapsed && <span>Sign out</span>}
             </button>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      ) : (
+        <div className="flex-1 p-4">
+          {!collapsed && (
+            <Auth
+              supabaseClient={supabase}
+              appearance={{ theme: ThemeSupa }}
+              theme={theme === "dark" ? "dark" : "light"}
+              providers={[]}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };
