@@ -44,8 +44,7 @@ const Sidebar = () => {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    // Subscribe to changes in the profiles table for the current user
-    const profileSubscription = supabase
+    const channel = supabase
       .channel('profile-changes')
       .on(
         'postgres_changes',
@@ -64,7 +63,7 @@ const Sidebar = () => {
       .subscribe();
 
     return () => {
-      profileSubscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [session?.user?.id]);
 

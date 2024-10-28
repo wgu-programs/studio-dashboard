@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,9 @@ const Profile = () => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -132,12 +135,10 @@ const Profile = () => {
   if (!profile) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="space-y-6">
+      <PageTitle>Profile</PageTitle>
       <Card>
-        <CardHeader>
-          <CardTitle>Profile</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-32 w-32">
               <AvatarImage src={profile.avatar_url || undefined} />
@@ -191,4 +192,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
