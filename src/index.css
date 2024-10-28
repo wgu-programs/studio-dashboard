@@ -68,33 +68,3 @@
 .sidebar-link.active {
   @apply bg-gray-100 text-gray-900 dark:bg-sidebar-hover dark:text-white;
 }
-
-@keyframes sunrise {
-  0% {
-    background: linear-gradient(to top, #ff8c42, #ffb88c, #ffffff);
-    transform: translateY(100%);
-  }
-  100% {
-    background: linear-gradient(to top, #ff8c42, #ffb88c, #ffffff);
-    transform: translateY(-100%);
-  }
-}
-
-@keyframes sunset {
-  0% {
-    background: linear-gradient(to bottom, #2c5364, #203a43, #0f2027);
-    transform: translateY(-100%);
-  }
-  100% {
-    background: linear-gradient(to bottom, #2c5364, #203a43, #0f2027);
-    transform: translateY(100%);
-  }
-}
-
-.animate-sunrise {
-  animation: sunrise 1s ease-out forwards;
-}
-
-.animate-sunset {
-  animation: sunset 1s ease-out forwards;
-}
