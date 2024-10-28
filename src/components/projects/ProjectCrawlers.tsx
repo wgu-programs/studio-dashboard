@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -10,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
+import { NewProjectCrawlerDialog } from "./NewProjectCrawlerDialog";
 
 interface Crawler {
   crawler_id: string;
@@ -25,6 +27,7 @@ interface ProjectCrawlersProps {
 export const ProjectCrawlers = ({ projectId }: ProjectCrawlersProps) => {
   const [crawlers, setCrawlers] = useState<Crawler[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchCrawlers = async () => {
     const { data, error } = await supabase
@@ -51,7 +54,10 @@ export const ProjectCrawlers = ({ projectId }: ProjectCrawlersProps) => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Crawlers</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Crawlers</h2>
+        <NewProjectCrawlerDialog projectId={projectId} onCrawlerCreated={fetchCrawlers} />
+      </div>
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
@@ -63,7 +69,11 @@ export const ProjectCrawlers = ({ projectId }: ProjectCrawlersProps) => {
           </TableHeader>
           <TableBody>
             {crawlers.map((crawler) => (
-              <TableRow key={crawler.crawler_id}>
+              <TableRow 
+                key={crawler.crawler_id}
+                className="cursor-pointer"
+                onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
+              >
                 <TableCell className="font-medium">{crawler.name || "Unnamed Crawler"}</TableCell>
                 <TableCell>{crawler.status}</TableCell>
                 <TableCell>
