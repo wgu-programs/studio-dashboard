@@ -7,6 +7,7 @@ import { LayoutGrid, Table } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -21,7 +22,6 @@ const Projects = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      // Only add the workspace_id filter if we have a currentWorkspaceId
       if (currentWorkspaceId) {
         const workspaceIdNumber = parseInt(currentWorkspaceId);
         if (!isNaN(workspaceIdNumber)) {
@@ -52,27 +52,27 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Projects</h1>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center border rounded-lg overflow-hidden">
-            <Button
-              variant={viewMode === "table" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("table")}
-            >
-              <Table className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("grid")}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-          </div>
-          <NewProjectDialog onProjectCreated={fetchProjects} />
+      <h1 className="text-4xl font-bold">Projects</h1>
+      <Breadcrumbs />
+      
+      <div className="flex justify-end items-center gap-4">
+        <div className="flex items-center border rounded-lg overflow-hidden">
+          <Button
+            variant={viewMode === "table" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setViewMode("table")}
+          >
+            <Table className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === "grid" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => setViewMode("grid")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
         </div>
+        <NewProjectDialog onProjectCreated={fetchProjects} />
       </div>
 
       {viewMode === "table" ? (
