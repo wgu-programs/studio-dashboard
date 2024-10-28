@@ -1,29 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useOutletContext, useNavigate } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generateRunName } from "@/utils/nameGenerator";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatDistanceToNow } from "date-fns";
 import { CrawlerDetailsCard } from "@/components/crawlers/CrawlerDetailsCard";
-import { Json } from "@/integrations/supabase/types/json";
-
-interface Crawler {
-  crawler_id: string;
-  name: string | null;
-  description: string | null;
-  project_id: string | null;
-  project: {
-    name: string;
-  } | null;
-  start_urls: Json | null;
-}
+import { RunCrawlerButton } from "@/components/crawlers/RunCrawlerButton";
+import { CrawlerRunsTable } from "@/components/crawlers/CrawlerRunsTable";
+import { Crawler } from "@/integrations/supabase/types/crawler";
 
 const CrawlerDetails = () => {
   const { crawlerId } = useParams();
-  const navigate = useNavigate();
   const [crawler, setCrawler] = useState<Crawler | null>(null);
   const [runs, setRuns] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -95,36 +81,6 @@ const CrawlerDetails = () => {
     }
   };
 
-  const handleRunCrawler = async () => {
-    try {
-      const { error } = await supabase
-        .from("runs")
-        .insert([
-          {
-            crawler_id: crawlerId,
-            status: "queued",
-            started_at: new Date().toISOString(),
-            name: generateRunName(),
-          },
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Crawler started successfully",
-      });
-      
-      fetchCrawler();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start crawler",
-        variant: "destructive",
-      });
-    }
-  };
-
   useEffect(() => {
     if (crawlerId) {
       fetchCrawler();
@@ -146,7 +102,11 @@ const CrawlerDetails = () => {
                 <Button onClick={() => setIsEditing(true)} variant="outline">
                   Edit
                 </Button>
-                <Button onClick={handleRunCrawler}>Run Crawler</Button>
+                <RunCrawlerButton 
+                  crawlerId={crawler.crawler_id} 
+                  startUrls={crawler.start_urls}
+                  onRunCreated={fetchCrawler}
+                />
               </>
             )}
           </div>
@@ -165,49 +125,7 @@ const CrawlerDetails = () => {
         onUpdate={fetchCrawler}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Runs</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Started</TableHead>
-                <TableHead>Completed</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {runs.map((run) => (
-                <TableRow 
-                  key={run.run_id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate(`/runs/${run.run_id}`)}
-                >
-                  <TableCell>{run.name || "Unnamed Run"}</TableCell>
-                  <TableCell>{run.status}</TableCell>
-                  <TableCell>
-                    {run.started_at
-                      ? formatDistanceToNow(new Date(run.started_at), {
-                          addSuffix: true,
-                        })
-                      : "Not started"}
-                  </TableCell>
-                  <TableCell>
-                    {run.completed_at
-                      ? formatDistanceToNow(new Date(run.completed_at), {
-                          addSuffix: true,
-                        })
-                      : "Not completed"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <CrawlerRunsTable runs={runs} />
     </div>
   );
 };
