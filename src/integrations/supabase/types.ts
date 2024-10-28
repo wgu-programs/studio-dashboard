@@ -390,6 +390,7 @@ export type Database = {
       }
       runs: {
         Row: {
+          archived: boolean | null
           completed_at: string | null
           crawler_id: string | null
           description: string | null
@@ -399,6 +400,7 @@ export type Database = {
           status: string | null
         }
         Insert: {
+          archived?: boolean | null
           completed_at?: string | null
           crawler_id?: string | null
           description?: string | null
@@ -408,6 +410,7 @@ export type Database = {
           status?: string | null
         }
         Update: {
+          archived?: boolean | null
           completed_at?: string | null
           crawler_id?: string | null
           description?: string | null
