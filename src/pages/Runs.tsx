@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { RunsTable } from "@/components/runs/RunsTable";
 
 const Runs = () => {
   const [showArchived, setShowArchived] = useState(false);
@@ -17,7 +18,12 @@ const Runs = () => {
     try {
       let query = supabase
         .from("runs")
-        .select("*")
+        .select(`
+          *,
+          crawler (
+            name
+          )
+        `)
         .order("started_at", { ascending: false });
 
       if (!showArchived) {
@@ -54,7 +60,7 @@ const Runs = () => {
         <Label htmlFor="show-archived">Show archived runs</Label>
       </div>
 
-      {/* TODO: Add runs table component */}
+      <RunsTable runs={runs} />
     </div>
   );
 };
