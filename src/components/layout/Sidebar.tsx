@@ -9,10 +9,11 @@ import { useTheme } from "../theme/theme-provider";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { SidebarFooter } from "./SidebarFooter";
+import { type Profile } from "@/integrations/supabase/types/profiles";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Sidebar = () => {
     });
 
     const {
-      data: { subscription },
+      data: { subscription: authSubscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
@@ -37,8 +38,35 @@ const Sidebar = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => authSubscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    // Subscribe to changes in the profiles table for the current user
+    const profileSubscription = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${session.user.id}`,
+        },
+        (payload) => {
+          if (payload.new) {
+            setProfile(payload.new as Profile);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      profileSubscription.unsubscribe();
+    };
+  }, [session?.user?.id]);
 
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
