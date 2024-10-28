@@ -70,7 +70,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`bg-white dark:bg-sidebar-background h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+      className={`bg-gradient-to-b from-[#F5F5F4] to-white dark:from-sidebar-background dark:to-[#1a2436] h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
