@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { type Profile as ProfileType } from "@/integrations/supabase/types";
+import { type Profile as ProfileType } from "@/integrations/supabase/types/profiles";
 
 const Profile = () => {
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -191,3 +191,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
