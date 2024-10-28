@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { generateRunName } from "@/utils/nameGenerator";
 
 interface Crawler {
   crawler_id: string;
@@ -90,7 +91,7 @@ const CrawlerDetails = () => {
             crawler_id: crawlerId,
             status: "queued",
             started_at: new Date().toISOString(),
-            name: `Run of ${crawler?.name || "Unnamed Crawler"}`,
+            name: generateRunName(),
           },
         ]);
 

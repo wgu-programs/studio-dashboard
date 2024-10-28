@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
+import { generateCrawlerName } from "@/utils/nameGenerator";
 
 interface NewCrawlerDialogProps {
   onCrawlerCreated: () => void;
@@ -20,7 +21,7 @@ interface NewCrawlerDialogProps {
 
 export const NewCrawlerDialog = ({ onCrawlerCreated }: NewCrawlerDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(generateCrawlerName());
   const [description, setDescription] = useState("");
   const { toast } = useToast();
 
@@ -46,7 +47,7 @@ export const NewCrawlerDialog = ({ onCrawlerCreated }: NewCrawlerDialogProps) =>
       });
 
       setOpen(false);
-      setName("");
+      setName(generateCrawlerName());
       setDescription("");
       onCrawlerCreated();
     } catch (error) {

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pause, Play, Square, Archive, Play as PlayIcon } from "lucide-react";
+import { generateRunName } from "@/utils/nameGenerator";
 
 interface CrawlerTableProps {
   crawlers: any[];
@@ -61,7 +62,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
             crawler_id: crawler.crawler_id,
             status: "queued",
             started_at: new Date().toISOString(),
-            name: `Run of ${crawler.name || "Unnamed Crawler"}`,
+            name: generateRunName(),
           },
         ]);
 

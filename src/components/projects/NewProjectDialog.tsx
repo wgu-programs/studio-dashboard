@@ -14,10 +14,11 @@ import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { generateProjectName } from "@/utils/nameGenerator";
 
 export const NewProjectDialog = ({ onProjectCreated }: { onProjectCreated: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(generateProjectName());
   const [description, setDescription] = useState("");
   const { toast } = useToast();
   const { currentWorkspaceId } = useWorkspace();
@@ -34,7 +35,6 @@ export const NewProjectDialog = ({ onProjectCreated }: { onProjectCreated: () =>
     }
 
     try {
-      // Convert currentWorkspaceId to number since the database expects a number
       const workspaceIdNumber = currentWorkspaceId ? parseInt(currentWorkspaceId) : null;
       
       const { error } = await supabase
@@ -52,7 +52,7 @@ export const NewProjectDialog = ({ onProjectCreated }: { onProjectCreated: () =>
         description: "Project created successfully",
       });
       setIsOpen(false);
-      setName("");
+      setName(generateProjectName());
       setDescription("");
       onProjectCreated();
     } catch (error) {
