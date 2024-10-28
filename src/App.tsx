@@ -7,6 +7,7 @@ import UserDetails from "@/pages/UserDetails";
 import WorkspaceMemberships from "@/pages/WorkspaceMemberships";
 import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
+import Crawlers from "@/pages/Crawlers";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { WorkspaceProvider } from "@/context/WorkspaceContext";
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/projects/:projectId",
         element: <ProjectDetails />,
+      },
+      {
+        path: "/crawlers",
+        element: <Crawlers />,
       },
     ],
   },
