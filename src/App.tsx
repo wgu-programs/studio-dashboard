@@ -5,7 +5,7 @@ import Layout from "./components/layout/Layout";
 import Index from "./pages/Index";
 import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
-import Crawers from "./pages/Crawers";
+import Crawlers from "./pages/Crawlers";
 import Runs from "./pages/Runs";
 import Personas from "./pages/Personas";
 import Tests from "./pages/Tests";
@@ -20,7 +20,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:projectId" element={<ProjectDetails />} />
-            <Route path="/crawers" element={<Crawers />} />
+            <Route path="/crawlers" element={<Crawlers />} />
             <Route path="/runs" element={<Runs />} />
             <Route path="/personas" element={<Personas />} />
             <Route path="/tests" element={<Tests />} />
