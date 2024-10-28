@@ -1,4 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,21 +10,94 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const getBreadcrumbs = (pathname: string) => {
-  const paths = pathname.split('/').filter(Boolean);
-  const breadcrumbs = paths.map((path, index) => {
-    const url = `/${paths.slice(0, index + 1).join('/')}`;
-    const label = path.charAt(0).toUpperCase() + path.slice(1);
-    const isLast = index === paths.length - 1;
-    return { url, label, isLast };
-  });
-
-  return breadcrumbs;
-};
+interface TitleMap {
+  [key: string]: string;
+}
 
 export const Breadcrumbs = () => {
   const location = useLocation();
-  const breadcrumbs = getBreadcrumbs(location.pathname);
+  const [titles, setTitles] = useState<TitleMap>({});
+
+  const fetchItemTitle = async (type: string, id: string) => {
+    try {
+      let data;
+      switch (type) {
+        case 'projects':
+          const { data: project } = await supabase
+            .from('projects')
+            .select('name')
+            .eq('project_id', id)
+            .single();
+          data = project?.name;
+          break;
+        case 'crawlers':
+          const { data: crawler } = await supabase
+            .from('crawler')
+            .select('name')
+            .eq('crawler_id', id)
+            .single();
+          data = crawler?.name;
+          break;
+        case 'runs':
+          const { data: run } = await supabase
+            .from('runs')
+            .select('name')
+            .eq('run_id', id)
+            .single();
+          data = run?.name;
+          break;
+        case 'pages':
+          const { data: page } = await supabase
+            .from('pages')
+            .select('title')
+            .eq('page_id', id)
+            .single();
+          data = page?.title;
+          break;
+        case 'personas':
+          const { data: persona } = await supabase
+            .from('personas')
+            .select('name')
+            .eq('persona_id', id)
+            .single();
+          data = persona?.name;
+          break;
+      }
+      return data || id;
+    } catch (error) {
+      console.error('Error fetching title:', error);
+      return id;
+    }
+  };
+
+  useEffect(() => {
+    const paths = location.pathname.split('/').filter(Boolean);
+    const fetchTitles = async () => {
+      const newTitles: TitleMap = {};
+      for (let i = 0; i < paths.length; i++) {
+        const path = paths[i];
+        const nextPath = paths[i + 1];
+        if (path && nextPath && !nextPath.includes('-')) continue;
+        if (path && nextPath && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(nextPath)) {
+          const title = await fetchItemTitle(path, nextPath);
+          newTitles[nextPath] = title;
+        }
+      }
+      setTitles(newTitles);
+    };
+
+    fetchTitles();
+  }, [location.pathname]);
+
+  const getBreadcrumbs = () => {
+    const paths = location.pathname.split('/').filter(Boolean);
+    return paths.map((path, index) => {
+      const url = `/${paths.slice(0, index + 1).join('/')}`;
+      const label = titles[path] || path.charAt(0).toUpperCase() + path.slice(1);
+      const isLast = index === paths.length - 1;
+      return { url, label, isLast };
+    });
+  };
 
   if (location.pathname === '/') return null;
 
@@ -37,7 +112,7 @@ export const Breadcrumbs = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           
-          {breadcrumbs.map((breadcrumb, index) => (
+          {getBreadcrumbs().map((breadcrumb, index) => (
             <BreadcrumbItem key={breadcrumb.url}>
               {breadcrumb.isLast ? (
                 <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
