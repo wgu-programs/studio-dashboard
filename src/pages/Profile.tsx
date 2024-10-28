@@ -137,7 +137,7 @@ const Profile = () => {
       <PageTitle>Profile</PageTitle>
       <div className="max-w-xl">
         <div className="space-y-8">
-          <div className="flex flex-col items-center space-y-4">
+          <div className="space-y-4">
             <Avatar className="h-32 w-32">
               <AvatarImage src={profile.avatar_url || undefined} />
               <AvatarFallback>
