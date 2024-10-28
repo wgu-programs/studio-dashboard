@@ -10,6 +10,7 @@ import Runs from "./pages/Runs";
 import Personas from "./pages/Personas";
 import Tests from "./pages/Tests";
 import Profile from "./pages/Profile";
+import Users from "./pages/Users";
 
 const App = () => (
   <ThemeProvider defaultTheme="dark">
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/personas" element={<Personas />} />
             <Route path="/tests" element={<Tests />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/users" element={<Users />} />
           </Route>
         </Routes>
       </BrowserRouter>

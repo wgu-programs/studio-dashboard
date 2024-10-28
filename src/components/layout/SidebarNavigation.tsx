@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Folder, Archive, Play, User, CheckSquare } from "lucide-react";
+import { LayoutDashboard, Folder, Archive, Play, User, CheckSquare, Users } from "lucide-react";
 
 interface SidebarNavigationProps {
   collapsed: boolean;
@@ -13,6 +13,7 @@ export const SidebarNavigation = ({ collapsed }: SidebarNavigationProps) => {
     { to: "/runs", icon: Play, label: "Runs" },
     { to: "/personas", icon: User, label: "Personas" },
     { to: "/tests", icon: CheckSquare, label: "Tests" },
+    { to: "/users", icon: Users, label: "Users" },
   ];
 
   return (
