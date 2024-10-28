@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,21 +12,20 @@ serve(async (req) => {
   }
 
   try {
-    const { url, crawler_id, run_id } = await req.json();
+    console.log('Received request:', req.method);
+    const body = await req.json();
+    console.log('Request body:', body);
 
     // Validate required parameters
-    if (!url) {
+    if (!body.url) {
       throw new Error('Missing required parameter: url');
     }
+
+    const { url, crawler_id, run_id } = body;
 
     console.log(`Processing page: ${url}`);
     console.log(`Crawler ID: ${crawler_id}`);
     console.log(`Run ID: ${run_id}`);
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch the page content
     const response = await fetch(url);
@@ -43,38 +41,25 @@ serve(async (req) => {
     const authorMatch = html.match(/<meta[^>]*name="author"[^>]*content="([^"]*)"[^>]*>/i);
     const author = authorMatch ? authorMatch[1].trim() : null;
 
-    // Update the page record with the fetched content
-    const { data, error } = await supabase
-      .from('pages')
-      .update({
+    return new Response(
+      JSON.stringify({
         title,
         description,
         author,
         html,
-        status: 'completed',
-      })
-      .eq('url', url)
-      .eq('crawler_id', crawler_id)
-      .eq('run_id', run_id)
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    console.log(`Successfully processed page: ${url}`);
-    
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+        status: 'completed'
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
 
   } catch (error) {
     console.error('Error processing page:', error);
-    
     return new Response(
-      JSON.stringify({ error: error.message }), {
-        status: 500,
+      JSON.stringify({ error: error.message }),
+      {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
