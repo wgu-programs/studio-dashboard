@@ -1,0 +1,50 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Loader2 } from "lucide-react";
+
+interface Page {
+  page_id: string;
+  url: string;
+  title: string | null;
+  description: string | null;
+  status: string | null;
+  snapshot_url: string | null;
+}
+
+interface PageCardsProps {
+  pages: Page[];
+}
+
+export const PageCards = ({ pages }: PageCardsProps) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {pages.map((page) => (
+        <Card key={page.page_id}>
+          <AspectRatio ratio={16 / 9}>
+            {page.status === "queued" ? (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              page.snapshot_url && (
+                <img
+                  src={page.snapshot_url}
+                  alt={page.title || "Page snapshot"}
+                  className="object-cover w-full h-full"
+                />
+              )
+            )}
+          </AspectRatio>
+          <CardContent className="p-4">
+            <h3 className="font-semibold truncate mb-2">
+              {page.title || "Untitled"}
+            </h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {page.description || "No description"}
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};

@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import { Run } from "@/integrations/supabase/types/runs";
 import { Crawler } from "@/integrations/supabase/types/crawler";
+import { Page } from "@/integrations/supabase/types/pages";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageTable } from "@/components/pages/PageTable";
+import { PageCards } from "@/components/pages/PageCards";
 
 interface RunWithCrawler extends Run {
   crawler: Partial<Crawler> | null;
@@ -14,6 +18,7 @@ interface RunWithCrawler extends Run {
 const RunDetails = () => {
   const { runId } = useParams();
   const [run, setRun] = useState<RunWithCrawler | null>(null);
+  const [pages, setPages] = useState<Page[]>([]);
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -37,6 +42,14 @@ const RunDetails = () => {
 
       if (error) throw error;
       setRun(data);
+
+      const { data: pagesData, error: pagesError } = await supabase
+        .from("pages")
+        .select("*")
+        .eq("run_id", runId);
+
+      if (pagesError) throw pagesError;
+      setPages(pagesData || []);
     } catch (error) {
       toast({
         title: "Error",
@@ -132,6 +145,26 @@ const RunDetails = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Pages</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="cards">
+            <TabsList>
+              <TabsTrigger value="cards">Cards</TabsTrigger>
+              <TabsTrigger value="table">Table</TabsTrigger>
+            </TabsList>
+            <TabsContent value="cards">
+              <PageCards pages={pages} />
+            </TabsContent>
+            <TabsContent value="table">
+              <PageTable pages={pages} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
