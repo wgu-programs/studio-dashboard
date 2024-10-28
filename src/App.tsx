@@ -5,6 +5,8 @@ import Profile from "@/pages/Profile";
 import Users from "@/pages/Users";
 import UserDetails from "@/pages/UserDetails";
 import WorkspaceMemberships from "@/pages/WorkspaceMemberships";
+import Projects from "@/pages/Projects";
+import ProjectDetails from "@/pages/ProjectDetails";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { WorkspaceProvider } from "@/context/WorkspaceContext";
@@ -32,6 +34,14 @@ const router = createBrowserRouter([
       {
         path: "/users/:userId",
         element: <UserDetails />,
+      },
+      {
+        path: "/projects",
+        element: <Projects />,
+      },
+      {
+        path: "/projects/:projectId",
+        element: <ProjectDetails />,
       },
     ],
   },
