@@ -13,6 +13,7 @@ interface EditableFieldProps {
   className?: string;
   inputClassName?: string;
   placeholder?: string;
+  tag?: keyof JSX.IntrinsicElements;
 }
 
 export const EditableField = ({ 
@@ -21,7 +22,8 @@ export const EditableField = ({
   inputType = "input",
   className,
   inputClassName,
-  placeholder = "No content"
+  placeholder = "No content",
+  tag: Tag = "div"
 }: EditableFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedValue, setEditedValue] = useState(value);
@@ -75,9 +77,9 @@ export const EditableField = ({
           onClick={() => setIsEditing(true)}
         >
           <div className="flex items-center gap-2">
-            <div className={cn("flex-grow", !value && "text-muted-foreground")}>
+            <Tag className={cn("flex-grow", !value && "text-muted-foreground")}>
               {value || placeholder}
-            </div>
+            </Tag>
             <Button
               size="sm"
               variant="ghost"

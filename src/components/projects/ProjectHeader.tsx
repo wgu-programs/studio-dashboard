@@ -32,6 +32,7 @@ export const ProjectHeader = ({ projectId, name, onProjectUpdate }: ProjectHeade
       onSave={handleSave}
       inputClassName="text-4xl font-bold h-12"
       className="w-full"
+      tag="h1"
     />
   );
 };

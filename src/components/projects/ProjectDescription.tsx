@@ -34,6 +34,7 @@ export const ProjectDescription = ({ projectId, description, onProjectUpdate }: 
         onSave={handleSave}
         inputType="textarea"
         placeholder="No description"
+        tag="p"
       />
     </div>
   );
