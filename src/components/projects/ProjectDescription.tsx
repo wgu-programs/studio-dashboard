@@ -27,15 +27,12 @@ export const ProjectDescription = ({ projectId, description, onProjectUpdate }: 
   };
 
   return (
-    <div className="space-y-2">
-      <h2 className="text-lg font-semibold">Description</h2>
-      <EditableField
-        value={description || ""}
-        onSave={handleSave}
-        inputType="textarea"
-        placeholder="No description"
-        tag="p"
-      />
-    </div>
+    <EditableField
+      value={description || ""}
+      onSave={handleSave}
+      inputType="textarea"
+      placeholder="No description"
+      tag="p"
+    />
   );
 };

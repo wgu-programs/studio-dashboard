@@ -1,0 +1,88 @@
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatDistanceToNow } from "date-fns";
+
+interface Crawler {
+  crawler_id: string;
+  name: string | null;
+  status: string | null;
+  created_at: string | null;
+}
+
+interface ProjectCrawlersProps {
+  projectId: string;
+}
+
+export const ProjectCrawlers = ({ projectId }: ProjectCrawlersProps) => {
+  const [crawlers, setCrawlers] = useState<Crawler[]>([]);
+  const { toast } = useToast();
+
+  const fetchCrawlers = async () => {
+    const { data, error } = await supabase
+      .from("crawler")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch crawlers",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCrawlers(data || []);
+  };
+
+  useEffect(() => {
+    fetchCrawlers();
+  }, [projectId]);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold">Crawlers</h2>
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {crawlers.map((crawler) => (
+              <TableRow key={crawler.crawler_id}>
+                <TableCell className="font-medium">{crawler.name || "Unnamed Crawler"}</TableCell>
+                <TableCell>{crawler.status}</TableCell>
+                <TableCell>
+                  {crawler.created_at
+                    ? formatDistanceToNow(new Date(crawler.created_at), { addSuffix: true })
+                    : "Unknown"}
+                </TableCell>
+              </TableRow>
+            ))}
+            {crawlers.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                  No crawlers found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+};
