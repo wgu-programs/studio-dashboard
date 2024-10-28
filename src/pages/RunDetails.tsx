@@ -8,7 +8,7 @@ import { Run } from "@/integrations/supabase/types/runs";
 import { Crawler } from "@/integrations/supabase/types/crawler";
 
 interface RunWithCrawler extends Run {
-  crawler: Crawler | null;
+  crawler: Partial<Crawler> | null;
 }
 
 const RunDetails = () => {
