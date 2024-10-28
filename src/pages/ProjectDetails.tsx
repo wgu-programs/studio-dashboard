@@ -63,15 +63,15 @@ const ProjectDetails = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
-          <ProjectDescription
+          <ProjectCrawlers projectId={project.project_id} />
+        </div>
+        <div>
+          <ProjectMetadata 
+            createdAt={project.created_at}
             projectId={project.project_id}
             description={project.description}
             onProjectUpdate={fetchProject}
           />
-          <ProjectCrawlers projectId={project.project_id} />
-        </div>
-        <div>
-          <ProjectMetadata createdAt={project.created_at} />
         </div>
       </div>
     </div>
