@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import { Run } from "@/integrations/supabase/types/runs";
+import { Crawler } from "@/integrations/supabase/types/crawler";
 
-interface Run {
-  run_id: string;
-  name: string;
-  description: string | null;
-  status: string;
-  started_at: string;
-  completed_at: string | null;
-  crawler: {
-    name: string;
-  } | null;
+interface RunWithCrawler extends Run {
+  crawler: Crawler | null;
 }
 
 const RunDetails = () => {
   const { runId } = useParams();
-  const [run, setRun] = useState<Run | null>(null);
+  const [run, setRun] = useState<RunWithCrawler | null>(null);
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -32,7 +26,10 @@ const RunDetails = () => {
         .select(`
           *,
           crawler (
-            name
+            crawler_id,
+            name,
+            description,
+            status
           )
         `)
         .eq("run_id", runId)
@@ -63,41 +60,78 @@ const RunDetails = () => {
     <div className="space-y-6">
       <PageTitle>{run.name || "Unnamed Run"}</PageTitle>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Run Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-medium">Status</h3>
-            <p className="text-sm text-muted-foreground capitalize">{run.status}</p>
-          </div>
-          <div>
-            <h3 className="font-medium">Crawler</h3>
-            <p className="text-sm text-muted-foreground">{run.crawler?.name || "Unknown Crawler"}</p>
-          </div>
-          <div>
-            <h3 className="font-medium">Started</h3>
-            <p className="text-sm text-muted-foreground">
-              {formatDistanceToNow(new Date(run.started_at), { addSuffix: true })}
-            </p>
-          </div>
-          {run.completed_at && (
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Run Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <h3 className="font-medium">Completed</h3>
+              <h3 className="font-medium">Status</h3>
+              <p className="text-sm text-muted-foreground capitalize">{run.status}</p>
+            </div>
+            <div>
+              <h3 className="font-medium">Started</h3>
               <p className="text-sm text-muted-foreground">
-                {formatDistanceToNow(new Date(run.completed_at), { addSuffix: true })}
+                {run.started_at
+                  ? formatDistanceToNow(new Date(run.started_at), { addSuffix: true })
+                  : "Not started"}
               </p>
             </div>
-          )}
-          {run.description && (
-            <div>
-              <h3 className="font-medium">Description</h3>
-              <p className="text-sm text-muted-foreground">{run.description}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {run.completed_at && (
+              <div>
+                <h3 className="font-medium">Completed</h3>
+                <p className="text-sm text-muted-foreground">
+                  {formatDistanceToNow(new Date(run.completed_at), { addSuffix: true })}
+                </p>
+              </div>
+            )}
+            {run.description && (
+              <div>
+                <h3 className="font-medium">Description</h3>
+                <p className="text-sm text-muted-foreground">{run.description}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Crawler Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {run.crawler ? (
+              <>
+                <div>
+                  <h3 className="font-medium">Name</h3>
+                  <Link 
+                    to={`/crawlers/${run.crawler.crawler_id}`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {run.crawler.name || "Unnamed Crawler"}
+                  </Link>
+                </div>
+                <div>
+                  <h3 className="font-medium">Status</h3>
+                  <p className="text-sm text-muted-foreground capitalize">
+                    {run.crawler.status}
+                  </p>
+                </div>
+                {run.crawler.description && (
+                  <div>
+                    <h3 className="font-medium">Description</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {run.crawler.description}
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">No crawler information available</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
