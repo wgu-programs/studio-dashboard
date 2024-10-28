@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 import { type Profile as ProfileType } from "@/integrations/supabase/types/profiles";
 
 const Profile = () => {
@@ -76,7 +75,6 @@ const Profile = () => {
         .from("profile-pictures")
         .getPublicUrl(filePath);
 
-      // Update the profile in the database with the new avatar URL
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ avatar_url: publicUrl })
@@ -137,8 +135,8 @@ const Profile = () => {
   return (
     <div className="space-y-6">
       <PageTitle>Profile</PageTitle>
-      <Card>
-        <CardContent className="space-y-6 pt-6">
+      <div className="max-w-xl">
+        <div className="space-y-8">
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-32 w-32">
               <AvatarImage src={profile.avatar_url || undefined} />
@@ -147,7 +145,7 @@ const Profile = () => {
                 {profile.last_name?.[0]}
               </AvatarFallback>
             </Avatar>
-            <div className="flex items-center space-x-4">
+            <div className="w-full">
               <Input
                 type="file"
                 accept="image/*"
@@ -185,8 +183,8 @@ const Profile = () => {
               Update Profile
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
