@@ -8,6 +8,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { type Profile } from "@/integrations/supabase/types/profiles";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface WorkspaceMembership {
+  workspace: {
+    id: number;
+    name: string | null;
+    description: string | null;
+  };
+  role: string | null;
+}
 
 const UserDetails = () => {
   const { userId } = useParams();
@@ -15,6 +40,10 @@ const UserDetails = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [memberships, setMemberships] = useState<WorkspaceMembership[]>([]);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<any[]>([]);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<string>("member");
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -42,8 +71,56 @@ const UserDetails = () => {
       setLastName(data.last_name || "");
     };
 
+    const fetchMemberships = async () => {
+      const { data, error } = await supabase
+        .from("workspace_users")
+        .select(`
+          workspace_id,
+          role,
+          workspaces (
+            id,
+            name,
+            description
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch workspace memberships",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setMemberships(data.map((wu: any) => ({
+        workspace: wu.workspaces,
+        role: wu.role,
+      })));
+    };
+
+    const fetchAvailableWorkspaces = async () => {
+      const { data, error } = await supabase
+        .from("workspaces")
+        .select("*");
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch workspaces",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAvailableWorkspaces(data);
+    };
+
     if (userId) {
       fetchProfile();
+      fetchMemberships();
+      fetchAvailableWorkspaces();
     }
   }, [userId, toast]);
 
@@ -126,12 +203,77 @@ const UserDetails = () => {
     }
   };
 
+  const handleAddToWorkspace = async () => {
+    if (!selectedWorkspace || !selectedRole) {
+      toast({
+        title: "Error",
+        description: "Please select both workspace and role",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("workspace_users")
+      .insert({
+        workspace_id: parseInt(selectedWorkspace),
+        user_id: userId,
+        role: selectedRole
+      });
+
+    if (error) {
+      if (error.code === '23505') {
+        toast({
+          title: "Error",
+          description: "User is already a member of this workspace",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add user to workspace",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "User added to workspace successfully",
+    });
+
+    // Refresh memberships
+    const { data: newMemberships } = await supabase
+      .from("workspace_users")
+      .select(`
+        workspace_id,
+        role,
+        workspaces (
+          id,
+          name,
+          description
+        )
+      `)
+      .eq('user_id', userId);
+
+    if (newMemberships) {
+      setMemberships(newMemberships.map((wu: any) => ({
+        workspace: wu.workspaces,
+        role: wu.role,
+      })));
+    }
+
+    setSelectedWorkspace("");
+    setSelectedRole("member");
+  };
+
   if (!profile) return null;
 
   return (
     <div className="space-y-6">
       <PageTitle>User Details</PageTitle>
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>User Profile</CardTitle>
@@ -183,6 +325,81 @@ const UserDetails = () => {
                 Update Profile
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Workspace Memberships</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <Label htmlFor="workspace">Workspace</Label>
+                <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select workspace" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableWorkspaces.map((workspace) => (
+                      <SelectItem key={workspace.id} value={workspace.id.toString()}>
+                        {workspace.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="role">Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="owner">Owner</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button onClick={handleAddToWorkspace}>Add to Workspace</Button>
+              </div>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Workspace Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Role</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {memberships.map((membership) => (
+                  <TableRow key={membership.workspace.id}>
+                    <TableCell className="font-medium">
+                      {membership.workspace.name || "Unnamed Workspace"}
+                    </TableCell>
+                    <TableCell>
+                      {membership.workspace.description || "No description"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {membership.role || "member"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {memberships.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                      User is not a member of any workspaces yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
