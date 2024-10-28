@@ -7,7 +7,6 @@ import { LayoutGrid, Table } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkspace } from "@/context/WorkspaceContext";
-import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -53,7 +52,6 @@ const Projects = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-4xl font-bold">Projects</h1>
-      <Breadcrumbs />
       
       <div className="flex justify-end items-center gap-4">
         <div className="flex items-center border rounded-lg overflow-hidden">
