@@ -42,15 +42,6 @@ const Sidebar = () => {
     fetchProfile();
   }, []);
 
-  const links = [
-    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/projects", icon: Folder, label: "Projects" },
-    { to: "/crawers", icon: Archive, label: "Crawers" },
-    { to: "/runs", icon: Play, label: "Runs" },
-    { to: "/personas", icon: User, label: "Personas" },
-    { to: "/tests", icon: CheckSquare, label: "Tests" },
-  ];
-
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -63,6 +54,15 @@ const Sidebar = () => {
     }
     navigate("/");
   };
+
+  const links = [
+    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/projects", icon: Folder, label: "Projects" },
+    { to: "/crawers", icon: Archive, label: "Crawers" },
+    { to: "/runs", icon: Play, label: "Runs" },
+    { to: "/personas", icon: User, label: "Personas" },
+    { to: "/tests", icon: CheckSquare, label: "Tests" },
+  ];
 
   return (
     <div
@@ -126,7 +126,11 @@ const Sidebar = () => {
             <NavLink
               to="/profile"
               className={({ isActive }) =>
-                `sidebar-link ${isActive ? "active" : ""}`
+                `w-full flex items-center gap-3 px-4 py-2 text-sm ${
+                  isActive
+                    ? "bg-gray-100 dark:bg-sidebar-hover text-gray-900 dark:text-white"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover"
+                } rounded-lg transition-colors`
               }
             >
               <Avatar className="h-8 w-8">
