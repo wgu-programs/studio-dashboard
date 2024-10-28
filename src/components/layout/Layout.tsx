@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import { Breadcrumbs } from "./Breadcrumbs";
 
 const Layout = () => {
   return (
@@ -7,6 +8,7 @@ const Layout = () => {
       <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="p-8">
+          <Breadcrumbs />
           <Outlet />
         </div>
       </main>
