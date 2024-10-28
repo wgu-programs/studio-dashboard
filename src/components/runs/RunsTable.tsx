@@ -1,4 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -22,6 +23,8 @@ const statusOrder = {
 };
 
 export const RunsTable = ({ runs }: RunsTableProps) => {
+  const navigate = useNavigate();
+
   // Group runs by status
   const groupedRuns = runs.reduce((acc, run) => {
     const status = run.status || 'unknown';
@@ -75,7 +78,11 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
             </TableHeader>
             <TableBody>
               {groupedRuns[status].map((run) => (
-                <TableRow key={run.run_id}>
+                <TableRow 
+                  key={run.run_id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => navigate(`/runs/${run.run_id}`)}
+                >
                   <TableCell className="font-medium">
                     {run.name || "Unnamed Run"}
                   </TableCell>
