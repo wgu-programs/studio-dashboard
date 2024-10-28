@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { ProjectDescription } from "./ProjectDescription";
+import { ProjectUsers } from "./ProjectUsers";
 
 interface ProjectMetadataProps {
   createdAt: string;
@@ -18,9 +19,12 @@ export const ProjectMetadata = ({ createdAt, projectId, description, onProjectUp
           description={description}
           onProjectUpdate={onProjectUpdate}
         />
-        <p className="text-sm text-muted-foreground">
-          Created {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Created {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
+          </p>
+          <ProjectUsers projectId={projectId} />
+        </div>
       </div>
     </div>
   );
