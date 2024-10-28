@@ -44,6 +44,7 @@ const Sidebar = () => {
   useEffect(() => {
     if (!session?.user?.id) return;
 
+    // Enable REALTIME updates for the profiles table
     const channel = supabase
       .channel('profile-changes')
       .on(
