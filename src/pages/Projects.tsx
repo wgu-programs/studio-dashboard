@@ -23,7 +23,7 @@ const Projects = () => {
 
       // Only add the workspace_id filter if we have a currentWorkspaceId
       if (currentWorkspaceId) {
-        query = query.eq("workspace_id", currentWorkspaceId);
+        query = query.eq("workspace_id", parseInt(currentWorkspaceId));
       }
 
       const { data, error } = await query;
@@ -40,8 +40,12 @@ const Projects = () => {
   };
 
   useEffect(() => {
-    fetchProjects();
-  }, [currentWorkspaceId]);
+    if (currentWorkspaceId) {
+      fetchProjects();
+    } else {
+      setProjects([]);
+    }
+  }, [currentWorkspaceId]); // Added currentWorkspaceId as a dependency
 
   return (
     <div className="space-y-6">
