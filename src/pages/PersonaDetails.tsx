@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { EditableField } from "@/components/ui/editable-field";
 import { MetadataTable } from "@/components/personas/MetadataTable";
 import { Persona } from "@/integrations/supabase/types/personas";
+import { Json } from "@/integrations/supabase/types/json";
 
 const PersonaDetails = () => {
   const { personaId } = useParams();
@@ -33,7 +34,7 @@ const PersonaDetails = () => {
     }
   };
 
-  const handleUpdateField = async (field: keyof Persona, value: string) => {
+  const handleUpdateField = async (field: keyof Persona, value: string | Record<string, Json>) => {
     try {
       const { error } = await supabase
         .from("personas")
@@ -93,7 +94,7 @@ const PersonaDetails = () => {
         <MetadataTable
           metadata={persona.metadata}
           onUpdate={async (metadata) => {
-            await handleUpdateField("metadata", JSON.stringify(metadata));
+            await handleUpdateField("metadata", metadata);
           }}
         />
       </div>

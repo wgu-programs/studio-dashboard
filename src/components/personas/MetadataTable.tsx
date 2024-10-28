@@ -22,7 +22,7 @@ type MetadataEntry = [string, Json];
 export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
   const [entries, setEntries] = useState<MetadataEntry[]>(() => {
     if (!metadata || typeof metadata !== "object") return [];
-    return Object.entries(metadata);
+    return Object.entries(metadata as Record<string, Json>);
   });
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
@@ -41,7 +41,7 @@ export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
     setIsEditing(true);
   };
 
-  const handleUpdateEntry = (index: number, key: string, value: string) => {
+  const handleUpdateEntry = (index: number, key: string, value: Json) => {
     const newEntries = [...entries];
     newEntries[index] = [key, value];
     setEntries(newEntries);
@@ -49,7 +49,7 @@ export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
   };
 
   const handleSave = async () => {
-    const newMetadata = Object.fromEntries(entries);
+    const newMetadata = Object.fromEntries(entries) as Record<string, Json>;
     await onUpdate(newMetadata);
     setIsEditing(false);
   };
@@ -71,7 +71,7 @@ export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
                 <TableCell>
                   <Input
                     value={key}
-                    onChange={(e) => handleUpdateEntry(index, e.target.value, String(value))}
+                    onChange={(e) => handleUpdateEntry(index, e.target.value, value)}
                     className="min-w-[200px]"
                   />
                 </TableCell>
