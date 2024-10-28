@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface User {
   id: string;
@@ -26,6 +28,7 @@ const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
   }>();
@@ -72,6 +75,10 @@ const Users = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
+        <Button onClick={() => navigate("/users/new")}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
       </div>
 
       <div className="border rounded-lg">
@@ -85,7 +92,11 @@ const Users = () => {
           </TableHeader>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id}>
+              <TableRow 
+                key={user.id}
+                className="cursor-pointer"
+                onClick={() => navigate(`/users/${user.id}`)}
+              >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar>
