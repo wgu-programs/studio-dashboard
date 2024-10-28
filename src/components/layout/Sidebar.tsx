@@ -17,6 +17,7 @@ import { useTheme } from "../theme/theme-provider";
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const links = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -27,12 +28,27 @@ const Sidebar = () => {
     { to: "/tests", icon: CheckSquare, label: "Tests" },
   ];
 
+  const handleThemeToggle = () => {
+    setIsAnimating(true);
+    setTheme(theme === "light" ? "dark" : "light");
+    setTimeout(() => setIsAnimating(false), 1000); // Match animation duration
+  };
+
   return (
     <div
-      className={`bg-white dark:bg-sidebar-background h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+      className={`bg-white dark:bg-sidebar-background h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 relative ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
+      {/* Theme transition overlay */}
+      <div
+        className={`absolute inset-0 pointer-events-none transition-opacity duration-1000 z-10 ${
+          isAnimating ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className={`absolute inset-0 ${theme === 'light' ? 'animate-sunrise' : 'animate-sunset'}`} />
+      </div>
+
       <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         {!collapsed && (
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">WGU Studio</h1>
@@ -64,7 +80,7 @@ const Sidebar = () => {
       </nav>
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <button
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          onClick={handleThemeToggle}
           className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
         >
           {theme === "light" ? (
