@@ -176,10 +176,7 @@ const Profile = () => {
               />
             </div>
 
-            <Button 
-              onClick={handleProfileUpdate}
-              className="w-full"
-            >
+            <Button onClick={handleProfileUpdate}>
               Update Profile
             </Button>
           </div>
