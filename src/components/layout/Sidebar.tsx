@@ -29,7 +29,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`bg-sidebar-background dark:bg-sidebar-background-dark h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
+      className={`bg-white dark:bg-sidebar-background h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
@@ -39,7 +39,7 @@ const Sidebar = () => {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 hover:bg-sidebar-hover-dark rounded-lg transition-colors text-gray-500 dark:text-gray-400"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors text-gray-500 dark:text-gray-400"
         >
           {collapsed ? (
             <ChevronRight className="h-5 w-5" />
@@ -65,7 +65,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <button
           onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark rounded-lg transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
         >
           {theme === "light" ? (
             <>
