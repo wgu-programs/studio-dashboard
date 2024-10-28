@@ -295,53 +295,27 @@ export type Database = {
       }
       profiles: {
         Row: {
+          description: string | null
           first_name: string | null
           id: string
           last_name: string | null
+          metadata: Json | null
         }
         Insert: {
+          description?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
+          metadata?: Json | null
         }
         Update: {
+          description?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
+          metadata?: Json | null
         }
         Relationships: []
-      }
-      project_users: {
-        Row: {
-          created_at: string | null
-          project_id: string | null
-          project_user_id: string
-          role: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          project_id?: string | null
-          project_user_id?: string
-          role?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          project_id?: string | null
-          project_user_id?: string
-          role?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_users_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["project_id"]
-          },
-        ]
       }
       projects: {
         Row: {
