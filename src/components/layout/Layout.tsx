@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { Breadcrumbs } from "./Breadcrumbs";
 
 const Layout = () => {
   return (
@@ -10,7 +9,6 @@ const Layout = () => {
         <div className="p-8">
           <div className="space-y-2">
             <Outlet />
-            <Breadcrumbs />
           </div>
         </div>
       </main>
