@@ -8,6 +8,7 @@ import { generateRunName } from "@/utils/nameGenerator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { CrawlerDetailsCard } from "@/components/crawlers/CrawlerDetailsCard";
+import { Json } from "@/integrations/supabase/types/json";
 
 interface Crawler {
   crawler_id: string;
@@ -17,7 +18,7 @@ interface Crawler {
   project: {
     name: string;
   } | null;
-  start_urls: string[] | null;
+  start_urls: Json | null;
 }
 
 const CrawlerDetails = () => {

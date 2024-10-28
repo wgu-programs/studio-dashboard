@@ -4,15 +4,21 @@ import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types/json";
 
 interface StartUrlsListProps {
   crawlerId: string;
-  initialUrls: string[];
+  initialUrls: Json | null;
   onUpdate: () => void;
 }
 
 export const StartUrlsList = ({ crawlerId, initialUrls, onUpdate }: StartUrlsListProps) => {
-  const [urls, setUrls] = useState<string[]>(initialUrls);
+  const [urls, setUrls] = useState<string[]>(() => {
+    if (Array.isArray(initialUrls)) {
+      return initialUrls as string[];
+    }
+    return [];
+  });
   const [newUrl, setNewUrl] = useState("");
   const { toast } = useToast();
 

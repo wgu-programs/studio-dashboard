@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { StartUrlsList } from "./StartUrlsList";
+import { Crawler } from "@/integrations/supabase/types/crawler";
 
 interface CrawlerDetailsCardProps {
-  crawler: any;
+  crawler: Partial<Crawler> & { project?: { name: string } | null };
   isEditing: boolean;
   name: string;
   description: string;
@@ -84,8 +85,8 @@ export const CrawlerDetailsCard = ({
             <div className="space-y-2">
               <Label>Start URLs</Label>
               <StartUrlsList
-                crawlerId={crawler.crawler_id}
-                initialUrls={crawler.start_urls || []}
+                crawlerId={crawler.crawler_id!}
+                initialUrls={crawler.start_urls}
                 onUpdate={onUpdate}
               />
             </div>
