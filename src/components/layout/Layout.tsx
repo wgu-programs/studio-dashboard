@@ -9,7 +9,9 @@ const Layout = () => {
       <main className="flex-1 overflow-auto">
         <div className="p-8">
           <div className="space-y-4">
-            <Outlet />
+            <Outlet context={{ PageTitle: ({ children }: { children: React.ReactNode }) => (
+              <h1 className="text-4xl font-bold">{children}</h1>
+            )}} />
             <Breadcrumbs />
           </div>
         </div>

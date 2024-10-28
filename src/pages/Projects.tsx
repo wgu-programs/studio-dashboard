@@ -7,12 +7,16 @@ import { LayoutGrid, Table } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { useOutletContext } from "react-router-dom";
 
 const Projects = () => {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [projects, setProjects] = useState<any[]>([]);
   const { toast } = useToast();
   const { currentWorkspaceId } = useWorkspace();
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
 
   const fetchProjects = async () => {
     try {
@@ -51,7 +55,7 @@ const Projects = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold">Projects</h1>
+      <PageTitle>Projects</PageTitle>
       
       <div className="flex justify-end items-center gap-4">
         <div className="flex items-center border rounded-lg overflow-hidden">
