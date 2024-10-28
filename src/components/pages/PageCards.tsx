@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Loader2 } from "lucide-react";
@@ -16,10 +17,16 @@ interface PageCardsProps {
 }
 
 export const PageCards = ({ pages }: PageCardsProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {pages.map((page) => (
-        <Card key={page.page_id}>
+        <Card 
+          key={page.page_id}
+          className="cursor-pointer hover:shadow-lg transition-shadow"
+          onClick={() => navigate(`/pages/${page.page_id}`)}
+        >
           <AspectRatio ratio={16 / 9}>
             {page.status === "queued" ? (
               <div className="w-full h-full bg-muted flex items-center justify-center">

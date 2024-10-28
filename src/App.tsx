@@ -13,6 +13,7 @@ import Runs from "@/pages/Runs";
 import RunDetails from "@/pages/RunDetails";
 import Personas from "@/pages/Personas";
 import PersonaDetails from "@/pages/PersonaDetails";
+import PageDetails from "@/pages/PageDetails";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { WorkspaceProvider } from "@/context/WorkspaceContext";
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
       {
         path: "/personas/:personaId",
         element: <PersonaDetails />,
+      },
+      {
+        path: "/pages/:pageId",
+        element: <PageDetails />,
       },
     ],
   },

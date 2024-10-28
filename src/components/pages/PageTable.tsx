@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -22,6 +23,8 @@ interface PageTableProps {
 }
 
 export const PageTable = ({ pages }: PageTableProps) => {
+  const navigate = useNavigate();
+
   return (
     <Table>
       <TableHeader>
@@ -34,7 +37,11 @@ export const PageTable = ({ pages }: PageTableProps) => {
       </TableHeader>
       <TableBody>
         {pages.map((page) => (
-          <TableRow key={page.page_id}>
+          <TableRow 
+            key={page.page_id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => navigate(`/pages/${page.page_id}`)}
+          >
             <TableCell className="font-medium">{page.title || "Untitled"}</TableCell>
             <TableCell>{page.url}</TableCell>
             <TableCell>{page.status}</TableCell>
