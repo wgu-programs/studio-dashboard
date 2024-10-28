@@ -14,11 +14,13 @@ import { Json } from "@/integrations/supabase/types/json";
 
 interface MetadataTableProps {
   metadata: Json | null;
-  onUpdate: (metadata: Record<string, string>) => Promise<void>;
+  onUpdate: (metadata: Record<string, Json>) => Promise<void>;
 }
 
+type MetadataEntry = [string, Json];
+
 export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
-  const [entries, setEntries] = useState<[string, string][]>(() => {
+  const [entries, setEntries] = useState<MetadataEntry[]>(() => {
     if (!metadata || typeof metadata !== "object") return [];
     return Object.entries(metadata);
   });
@@ -69,13 +71,13 @@ export const MetadataTable = ({ metadata, onUpdate }: MetadataTableProps) => {
                 <TableCell>
                   <Input
                     value={key}
-                    onChange={(e) => handleUpdateEntry(index, e.target.value, value)}
+                    onChange={(e) => handleUpdateEntry(index, e.target.value, String(value))}
                     className="min-w-[200px]"
                   />
                 </TableCell>
                 <TableCell>
                   <Input
-                    value={value}
+                    value={String(value)}
                     onChange={(e) => handleUpdateEntry(index, key, e.target.value)}
                   />
                 </TableCell>
