@@ -10,6 +10,7 @@ const Layout = () => {
         <div className="p-8">
           <div className="space-y-4">
             <Outlet />
+            <Breadcrumbs />
           </div>
         </div>
       </main>
