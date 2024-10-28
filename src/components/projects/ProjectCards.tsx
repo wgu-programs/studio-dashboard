@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 
@@ -9,10 +10,16 @@ interface Project {
 }
 
 export const ProjectCards = ({ projects }: { projects: Project[] }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <Card key={project.project_id} className="hover:shadow-lg transition-shadow">
+        <Card 
+          key={project.project_id} 
+          className="hover:shadow-lg transition-shadow cursor-pointer"
+          onClick={() => navigate(`/projects/${project.project_id}`)}
+        >
           <CardHeader className="space-y-2">
             <CardTitle className="text-xl">{project.name}</CardTitle>
           </CardHeader>

@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -16,6 +17,8 @@ interface Project {
 }
 
 export const ProjectTable = ({ projects }: { projects: Project[] }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -28,7 +31,11 @@ export const ProjectTable = ({ projects }: { projects: Project[] }) => {
         </TableHeader>
         <TableBody>
           {projects.map((project) => (
-            <TableRow key={project.project_id}>
+            <TableRow 
+              key={project.project_id}
+              className="cursor-pointer"
+              onClick={() => navigate(`/projects/${project.project_id}`)}
+            >
               <TableCell className="font-medium">{project.name}</TableCell>
               <TableCell>{project.description || "No description"}</TableCell>
               <TableCell>
