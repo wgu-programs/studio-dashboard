@@ -1,7 +1,13 @@
+import { useOutletContext } from "react-router-dom";
+
 const Crawers = () => {
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
+
   return (
     <div className="space-y-4">
-      <h1 className="text-4xl font-bold">Crawers</h1>
+      <PageTitle>Crawlers</PageTitle>
     </div>
   );
 };
