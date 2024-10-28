@@ -9,10 +9,14 @@ import {
   CheckSquare,
   ChevronLeft,
   ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "../theme/theme-provider";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const links = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -25,22 +29,22 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`bg-sidebar-background h-screen flex flex-col border-r border-gray-800 transition-all duration-300 ${
+      className={`bg-sidebar-background dark:bg-sidebar-background-dark h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         {!collapsed && (
-          <h1 className="text-xl font-bold text-white">WGU Studio</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">WGU Studio</h1>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 hover:bg-sidebar-hover rounded-lg transition-colors"
+          className="p-2 hover:bg-sidebar-hover-dark rounded-lg transition-colors text-gray-500 dark:text-gray-400"
         >
           {collapsed ? (
-            <ChevronRight className="h-5 w-5 text-gray-400" />
+            <ChevronRight className="h-5 w-5" />
           ) : (
-            <ChevronLeft className="h-5 w-5 text-gray-400" />
+            <ChevronLeft className="h-5 w-5" />
           )}
         </button>
       </div>
@@ -58,6 +62,24 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <button
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark rounded-lg transition-colors"
+        >
+          {theme === "light" ? (
+            <>
+              <Moon className="h-5 w-5" />
+              {!collapsed && <span>Dark mode</span>}
+            </>
+          ) : (
+            <>
+              <Sun className="h-5 w-5" />
+              {!collapsed && <span>Light mode</span>}
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 };
