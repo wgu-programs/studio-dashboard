@@ -8,6 +8,7 @@ export type Database = {
         Row: Profile;
         Insert: ProfileInsert;
         Update: ProfileUpdate;
+        Relationships: [];
       };
       crawler: {
         Row: {
@@ -459,4 +460,4 @@ export type Database = {
   };
 };
 
-export { type Json, type Profile, type ProfileInsert, type ProfileUpdate };
+export type { Json, Profile, ProfileInsert, ProfileUpdate };
