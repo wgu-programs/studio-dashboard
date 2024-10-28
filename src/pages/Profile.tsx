@@ -72,6 +72,16 @@ const Profile = () => {
         .from("profile-pictures")
         .getPublicUrl(filePath);
 
+      // Update the profile in the database with the new avatar URL
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl })
+        .eq("id", profile.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
       setProfile({ ...profile, avatar_url: publicUrl });
 
       toast({
