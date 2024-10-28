@@ -23,7 +23,10 @@ const Projects = () => {
 
       // Only add the workspace_id filter if we have a currentWorkspaceId
       if (currentWorkspaceId) {
-        query = query.eq("workspace_id", parseInt(currentWorkspaceId));
+        const workspaceIdNumber = parseInt(currentWorkspaceId);
+        if (!isNaN(workspaceIdNumber)) {
+          query = query.eq("workspace_id", workspaceIdNumber);
+        }
       }
 
       const { data, error } = await query;
@@ -45,7 +48,7 @@ const Projects = () => {
     } else {
       setProjects([]);
     }
-  }, [currentWorkspaceId]); // Added currentWorkspaceId as a dependency
+  }, [currentWorkspaceId]);
 
   return (
     <div className="space-y-6">
