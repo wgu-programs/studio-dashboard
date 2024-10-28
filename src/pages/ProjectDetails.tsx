@@ -53,11 +53,13 @@ const ProjectDetails = () => {
 
   return (
     <div className="space-y-8">
-      <ProjectHeader 
-        projectId={project.project_id} 
-        name={project.name}
-        onProjectUpdate={fetchProject}
-      />
+      <PageTitle>
+        <ProjectHeader 
+          projectId={project.project_id} 
+          name={project.name}
+          onProjectUpdate={fetchProject}
+        />
+      </PageTitle>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">

@@ -30,8 +30,7 @@ export const ProjectHeader = ({ projectId, name, onProjectUpdate }: ProjectHeade
     <EditableField
       value={name}
       onSave={handleSave}
-      inputClassName="text-4xl font-bold h-12"
-      className="w-full"
+      inputClassName="text-4xl font-bold"
       tag="h1"
     />
   );
