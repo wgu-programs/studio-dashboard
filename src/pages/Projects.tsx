@@ -16,11 +16,17 @@ const Projects = () => {
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("projects")
         .select("*")
-        .eq("workspace_id", currentWorkspaceId)
         .order("created_at", { ascending: false });
+
+      // Only add the workspace_id filter if we have a currentWorkspaceId
+      if (currentWorkspaceId) {
+        query = query.eq("workspace_id", currentWorkspaceId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setProjects(data || []);
@@ -34,9 +40,7 @@ const Projects = () => {
   };
 
   useEffect(() => {
-    if (currentWorkspaceId) {
-      fetchProjects();
-    }
+    fetchProjects();
   }, [currentWorkspaceId]);
 
   return (
