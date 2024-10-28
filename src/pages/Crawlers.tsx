@@ -4,12 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CrawlerTable } from "@/components/crawlers/CrawlerTable";
 import { NewCrawlerDialog } from "@/components/crawlers/NewCrawlerDialog";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 const Crawlers = () => {
   const [crawlers, setCrawlers] = useState<any[]>([]);
-  const [showArchived, setShowArchived] = useState(false);
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -44,21 +41,13 @@ const Crawlers = () => {
     <div className="space-y-6">
       <PageTitle>Crawlers</PageTitle>
       
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="show-archived"
-            checked={showArchived}
-            onCheckedChange={setShowArchived}
-          />
-          <Label htmlFor="show-archived">Show archived runs</Label>
-        </div>
+      <div className="flex justify-end">
         <NewCrawlerDialog onCrawlerCreated={fetchCrawlers} />
       </div>
 
       <CrawlerTable 
         crawlers={crawlers} 
-        showArchived={showArchived}
+        showArchived={false}
         onRunStatusChange={fetchCrawlers}
       />
     </div>
