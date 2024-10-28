@@ -8,6 +8,7 @@ import Crawers from "./pages/Crawers";
 import Runs from "./pages/Runs";
 import Personas from "./pages/Personas";
 import Tests from "./pages/Tests";
+import Profile from "./pages/Profile";
 
 const App = () => (
   <ThemeProvider defaultTheme="dark">
@@ -21,6 +22,7 @@ const App = () => (
             <Route path="/runs" element={<Runs />} />
             <Route path="/personas" element={<Personas />} />
             <Route path="/tests" element={<Tests />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </BrowserRouter>
