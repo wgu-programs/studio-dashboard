@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,9 @@ const ProjectDetails = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const { toast } = useToast();
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -48,7 +51,7 @@ const ProjectDetails = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold">{project.name}</h1>
+      <PageTitle>{project.name}</PageTitle>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
