@@ -12,8 +12,9 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
         navigate("/");
         return;
       }
@@ -21,7 +22,7 @@ const Profile = () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", session.session.user.id)
+        .eq("id", session.user.id)
         .single();
 
       if (error) {
@@ -59,6 +60,11 @@ const Profile = () => {
               <h2 className="text-2xl font-bold">
                 {profile.first_name} {profile.last_name}
               </h2>
+              {profile.description && (
+                <p className="text-gray-500 dark:text-gray-400">
+                  {profile.description}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>

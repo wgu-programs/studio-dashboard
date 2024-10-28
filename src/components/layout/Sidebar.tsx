@@ -17,30 +17,54 @@ import { useTheme } from "../theme/theme-provider";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { Session } from "@supabase/supabase-js";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) return;
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+    });
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.session.user.id)
-        .single();
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+    });
 
-      if (data) setProfile(data);
-    };
-
-    fetchProfile();
+    return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching profile:", error);
+      return;
+    }
+
+    if (data) setProfile(data);
+  };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -121,7 +145,7 @@ const Sidebar = () => {
           )}
         </button>
 
-        {profile && (
+        {session && profile && (
           <>
             <NavLink
               to="/profile"
