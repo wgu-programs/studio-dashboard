@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 interface Project {
   project_id: string;
@@ -49,6 +50,7 @@ const ProjectDetails = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-4xl font-bold">{project.name}</h1>
+      <Breadcrumbs />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
