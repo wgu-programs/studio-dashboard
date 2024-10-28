@@ -7,9 +7,10 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import type { Profile } from "@/integrations/supabase/types";
 
 const Profile = () => {
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -58,7 +59,7 @@ const Profile = () => {
 
       const file = event.target.files[0];
       const fileExt = file.name.split(".").pop();
-      const filePath = `${profile.id}.${fileExt}`;
+      const filePath = `${profile?.id}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("profile-pictures")
@@ -76,13 +77,13 @@ const Profile = () => {
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ avatar_url: publicUrl })
-        .eq("id", profile.id);
+        .eq("id", profile?.id);
 
       if (updateError) {
         throw updateError;
       }
 
-      setProfile({ ...profile, avatar_url: publicUrl });
+      setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
 
       toast({
         title: "Success",
@@ -101,6 +102,8 @@ const Profile = () => {
 
   const handleProfileUpdate = async () => {
     try {
+      if (!profile) return;
+
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -116,7 +119,7 @@ const Profile = () => {
         description: "Profile updated successfully",
       });
 
-      setProfile({ ...profile, first_name: firstName, last_name: lastName });
+      setProfile(prev => prev ? { ...prev, first_name: firstName, last_name: lastName } : null);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -137,7 +140,7 @@ const Profile = () => {
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-32 w-32">
-              <AvatarImage src={profile.avatar_url} />
+              <AvatarImage src={profile.avatar_url || undefined} />
               <AvatarFallback>
                 {profile.first_name?.[0]}
                 {profile.last_name?.[0]}
