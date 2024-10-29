@@ -24,7 +24,10 @@ const PersonaDetails = () => {
         .single();
 
       if (error) throw error;
-      setPersona(data);
+      setPersona({
+        ...data,
+        workspace_id: data.workspace_id?.toString()
+      });
     } catch (error) {
       toast({
         title: "Error",

@@ -25,7 +25,10 @@ const Personas = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setPersonas(data || []);
+      setPersonas(data?.map(persona => ({
+        ...persona,
+        workspace_id: persona.workspace_id?.toString()
+      })) || []);
     } catch (error) {
       toast({
         title: "Error",

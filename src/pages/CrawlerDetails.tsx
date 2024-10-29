@@ -32,7 +32,10 @@ const CrawlerDetails = () => {
         .single();
 
       if (crawlerError) throw crawlerError;
-      setCrawler(crawlerData);
+      setCrawler({
+        ...crawlerData,
+        workspace_id: crawlerData.workspace_id?.toString()
+      });
       setName(crawlerData.name || "");
       setDescription(crawlerData.description || "");
 

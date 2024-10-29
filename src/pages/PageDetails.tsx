@@ -24,7 +24,10 @@ const PageDetails = () => {
         .single();
 
       if (error) throw error;
-      setPage(data);
+      setPage({
+        ...data,
+        workspace_id: data.workspace_id?.toString()
+      });
     } catch (error) {
       toast({
         title: "Error",
