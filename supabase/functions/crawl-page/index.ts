@@ -16,8 +16,17 @@ serve(async (req) => {
     console.log('Request headers:', Object.fromEntries(req.headers.entries()));
     console.log('Request method:', req.method);
     
-    const body = await req.json();
-    console.log('Request body (raw):', JSON.stringify(body, null, 2));
+    const rawBody = await req.text();
+    console.log('Raw request body:', rawBody);
+    
+    let body;
+    try {
+      body = JSON.parse(rawBody);
+      console.log('Parsed request body:', JSON.stringify(body, null, 2));
+    } catch (parseError) {
+      console.error('Error parsing request body:', parseError);
+      throw new Error(`Invalid JSON body: ${parseError.message}`);
+    }
     
     // Validate required parameters
     if (!body.url) {
