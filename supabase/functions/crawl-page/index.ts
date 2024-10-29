@@ -12,26 +12,33 @@ serve(async (req) => {
   }
 
   try {
-    // Log the raw request for debugging
+    // Log the request details for debugging
     console.log('Request headers:', Object.fromEntries(req.headers.entries()));
     console.log('Request method:', req.method);
-    
+
     const rawBody = await req.text();
     console.log('Raw request body:', rawBody);
-    
+
     let body;
     try {
+      // Try parsing the raw body as JSON
       body = JSON.parse(rawBody);
       console.log('Parsed request body:', JSON.stringify(body, null, 2));
     } catch (parseError) {
       console.error('Error parsing request body:', parseError);
-      throw new Error(`Invalid JSON body: ${parseError.message}`);
+      return new Response(
+        JSON.stringify({ error: `Invalid JSON body: ${parseError.message}` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
     
     // Validate required parameters
     if (!body.url) {
       console.error('Missing URL in request body:', body);
-      throw new Error('Missing required parameter: url');
+      return new Response(
+        JSON.stringify({ error: 'Missing required parameter: url' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const { url, crawler_id, run_id } = body;
