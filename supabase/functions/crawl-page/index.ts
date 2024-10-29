@@ -2,7 +2,7 @@
  * @Author                : David Petersen <david.petersen@wgu.edu>           *
  * @CreatedDate           : 2024-10-29 14:06:11                               *
  * @LastEditors           : David Petersen <david.petersen@wgu.edu>           *
- * @LastEditDate          : 2024-10-29 14:06:11                               *
+ * @LastEditDate          : 2024-10-29 14:12:42                               *
  * @FilePath              : studio-dashboard/supabase/functions/crawl-page/index.ts*
  * @CopyRight             : Western Governors University                      *
  *****************************************************************************/
@@ -27,6 +27,7 @@ const getUrlFromRequest = async (req: Request) => {
   const contentType = req.headers.get('content-type');
   const urlMatch = contentType?.match(/url=([^;]+)/);
   const body = await req.json()?.record;
+  console.log(body);
   return urlMatch ? decodeURIComponent(urlMatch[1]) : body?.url;
 };
 
