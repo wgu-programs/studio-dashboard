@@ -18,6 +18,12 @@ begin
   -- Log the payload for debugging
   RAISE NOTICE 'Sending payload: %', payload;
 
+  -- Only trigger the edge function if we have a URL
+  IF NEW.url IS NULL THEN
+    RAISE WARNING 'Skipping edge function call: URL is null';
+    RETURN NEW;
+  END IF;
+
   SELECT
     status INTO response_status
   FROM

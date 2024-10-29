@@ -18,6 +18,7 @@ serve(async (req) => {
 
     // Validate required parameters
     if (!body.url) {
+      console.error('Missing URL in request body:', body);
       throw new Error('Missing required parameter: url');
     }
 
@@ -29,6 +30,10 @@ serve(async (req) => {
 
     // Fetch the page content
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch page: ${response.status} ${response.statusText}`);
+    }
+    
     const html = await response.text();
 
     // Extract metadata using regex patterns
