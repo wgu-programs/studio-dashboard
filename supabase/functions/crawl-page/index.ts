@@ -1,14 +1,14 @@
 /******************************************************************************
  * @Author                : David Petersen <david.petersen@wgu.edu>           *
- * @CreatedDate           : 2024-10-29 14:06:11                               *
+ * @CreatedDate           : 2024-10-29 14:27:31                               *
  * @LastEditors           : David Petersen <david.petersen@wgu.edu>           *
- * @LastEditDate          : 2024-10-29 14:21:49                               *
+ * @LastEditDate          : 2024-10-29 14:27:31                               *
  * @FilePath              : studio-dashboard/supabase/functions/crawl-page/index.ts*
  * @CopyRight             : Western Governors University                      *
  *****************************************************************************/
 
+import { chromium } from "https://deno.land/x/playwright@v1.34.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -29,18 +29,18 @@ const getUrlFromRequest = async (req: Request) => {
 };
 
 const launchBrowserAndPage = async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setViewport({ width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT });
+  const browser = await chromium.launch();
+  const context = await browser.newContext({ viewport: { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT } });
+  const page = await context.newPage();
   return { browser, page };
 };
 
 const captureScreenshot = async (page: any, url: string) => {
-  await page.goto(url, { waitUntil: 'networkidle0' });
-  return page.screenshot({ type: 'jpeg', quality: 80, fullPage: true });
+  await page.goto(url, { waitUntil: 'networkidle' });
+  return await page.screenshot({ type: 'jpeg', quality: 80, fullPage: true });
 };
 
-const uploadScreenshot = async (screenshot: Buffer, filename: string) => {
+const uploadScreenshot = async (screenshot: Uint8Array, filename: string) => {
   const { error: uploadError } = await supabase.storage
     .from('snapshots')
     .upload(filename, screenshot, { contentType: 'image/jpeg', upsert: true });
@@ -51,11 +51,9 @@ const uploadScreenshot = async (screenshot: Buffer, filename: string) => {
 };
 
 const fetchPageData = async (page: any) => {
-  const [title, description, html] = await Promise.all([
-    page.title(),
-    page.$eval('meta[name="description"]', el => el.getAttribute('content')).catch(() => null),
-    page.content(),
-  ]);
+  const title = await page.title();
+  const description = await page.$eval('meta[name="description"]', el => el.getAttribute('content')).catch(() => null);
+  const html = await page.content();
   return { title, description, html };
 };
 
