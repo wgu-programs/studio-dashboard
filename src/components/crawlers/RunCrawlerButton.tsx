@@ -3,7 +3,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRunName } from "@/utils/nameGenerator";
 import { Json } from "@/integrations/supabase/types/json";
-import { PageInsert } from "@/integrations/supabase/types/pages";
 
 interface RunCrawlerButtonProps {
   crawlerId: string;
@@ -34,12 +33,14 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
       // Get the workspace_id either directly from crawler or from its project
       const workspace_id = crawlerData.workspace_id || crawlerData.projects?.workspace_id;
 
-      // Then create the run
+      // Create the run
       const { data: runData, error: runError } = await supabase
         .from("runs")
         .insert([
           {
             crawler_id: crawlerId,
+            project_id: crawlerData.project_id,
+            workspace_id: workspace_id,
             status: "queued",
             started_at: new Date().toISOString(),
             name: generateRunName(),
@@ -52,7 +53,7 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
 
       // Then add all start URLs as pages
       if (Array.isArray(startUrls) && startUrls.length > 0) {
-        const pages: PageInsert[] = startUrls.map((url: string) => ({
+        const pages = startUrls.map((url: string) => ({
           url,
           crawler_id: crawlerId,
           run_id: runData.run_id,
@@ -66,6 +67,12 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
           .insert(pages);
 
         if (pagesError) throw pagesError;
+      } else {
+        toast({
+          title: "Warning",
+          description: "No start URLs configured for this crawler",
+          variant: "warning",
+        });
       }
 
       toast({
@@ -74,10 +81,11 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
       });
       
       onRunCreated();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error starting crawler:', error);
       toast({
         title: "Error",
-        description: "Failed to start crawler",
+        description: error.message || "Failed to start crawler",
         variant: "destructive",
       });
     }
