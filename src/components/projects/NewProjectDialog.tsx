@@ -35,14 +35,12 @@ export const NewProjectDialog = ({ onProjectCreated }: { onProjectCreated: () =>
     }
 
     try {
-      const workspaceIdNumber = currentWorkspaceId ? parseInt(currentWorkspaceId) : null;
-      
       const { error } = await supabase
         .from("projects")
         .insert({
           name,
           description: description || null,
-          workspace_id: workspaceIdNumber,
+          workspace_id: currentWorkspaceId,
         });
 
       if (error) throw error;

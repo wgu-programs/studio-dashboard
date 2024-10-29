@@ -26,10 +26,7 @@ const Projects = () => {
         .order("created_at", { ascending: false });
 
       if (currentWorkspaceId) {
-        const workspaceIdNumber = parseInt(currentWorkspaceId);
-        if (!isNaN(workspaceIdNumber)) {
-          query = query.eq("workspace_id", workspaceIdNumber);
-        }
+        query = query.eq("workspace_id", currentWorkspaceId);
       }
 
       const { data, error } = await query;
