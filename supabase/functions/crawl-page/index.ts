@@ -1,13 +1,13 @@
 /******************************************************************************
  * @Author                : David Petersen <david.petersen@wgu.edu>           *
- * @CreatedDate           : 2024-10-29 14:27:31                               *
+ * @CreatedDate           : 2024-10-29 14:34:18                               *
  * @LastEditors           : David Petersen <david.petersen@wgu.edu>           *
- * @LastEditDate          : 2024-10-29 14:27:31                               *
+ * @LastEditDate          : 2024-10-29 14:35:34                               *
  * @FilePath              : studio-dashboard/supabase/functions/crawl-page/index.ts*
  * @CopyRight             : Western Governors University                      *
  *****************************************************************************/
 
-import { chromium } from "https://deno.land/x/playwright@v1.34.0/mod.ts";
+import { captureScreenshot } from "https://deno.land/x/hvb_screenshots/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -28,16 +28,17 @@ const getUrlFromRequest = async (req: Request) => {
   return body?.record?.url;
 };
 
-const launchBrowserAndPage = async () => {
-  const browser = await chromium.launch();
-  const context = await browser.newContext({ viewport: { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT } });
-  const page = await context.newPage();
-  return { browser, page };
-};
+const takeScreenshot = async (url: string) => {
+  // Capture screenshot using hvb-screenshots
+  const screenshot = await captureScreenshot(url, {
+    width: VIEWPORT_WIDTH,
+    height: VIEWPORT_HEIGHT,
+    format: "jpeg",
+    quality: 80,
+    fullPage: true,
+  });
 
-const captureScreenshot = async (page: any, url: string) => {
-  await page.goto(url, { waitUntil: 'networkidle' });
-  return await page.screenshot({ type: 'jpeg', quality: 80, fullPage: true });
+  return screenshot;
 };
 
 const uploadScreenshot = async (screenshot: Uint8Array, filename: string) => {
@@ -50,10 +51,15 @@ const uploadScreenshot = async (screenshot: Uint8Array, filename: string) => {
   return data?.publicUrl;
 };
 
-const fetchPageData = async (page: any) => {
-  const title = await page.title();
-  const description = await page.$eval('meta[name="description"]', el => el.getAttribute('content')).catch(() => null);
-  const html = await page.content();
+const fetchPageData = async (url: string) => {
+  const response = await fetch(url);
+  const html = await response.text();
+
+  // Parse HTML for title and description if needed
+  const title = html.match(/<title>(.*?)<\/title>/)?.[1] ?? null;
+  const descriptionMatch = html.match(/<meta name="description" content="(.*?)">/);
+  const description = descriptionMatch ? descriptionMatch[1] : null;
+
   return { title, description, html };
 };
 
@@ -72,17 +78,14 @@ serve(async (req) => {
     const url = await getUrlFromRequest(req);
     if (!url) throw new Error('No URL provided in either content-type header or request body');
 
-    const { browser, page } = await launchBrowserAndPage();
-    const screenshot = await captureScreenshot(page, url);
+    const screenshot = await takeScreenshot(url);
 
     const timestamp = new Date().getTime();
     const filename = `${timestamp}.jpg`;
     const publicUrl = await uploadScreenshot(screenshot, filename);
 
-    const { title, description, html } = await fetchPageData(page);
+    const { title, description, html } = await fetchPageData(url);
     await updatePageRecord(url, { title, description, html, snapshot_url: publicUrl, status: 'completed' });
-
-    await browser.close();
 
     return new Response(JSON.stringify({ success: true, url: publicUrl }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
