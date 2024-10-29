@@ -57,7 +57,7 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
           crawler_id: crawlerId,
           run_id: runData.run_id,
           project_id: crawlerData.project_id,
-          workspace_id: workspace_id ? Number(workspace_id) : null,
+          workspace_id: workspace_id,
           status: "queued",
         }));
 
