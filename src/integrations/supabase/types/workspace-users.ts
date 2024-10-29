@@ -1,6 +1,6 @@
 export interface WorkspaceUser {
   workspace_user_id: string;
-  workspace_id: number | null;
+  workspace_id: string | null;
   user_id: string | null;
   role: string | null;
   created_at: string;

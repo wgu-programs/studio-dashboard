@@ -1,11 +1,9 @@
-import { Json } from "./json";
-
 export interface Project {
   project_id: string;
   name: string;
   description: string | null;
   created_at: string | null;
-  workspace_id: number | null;
+  workspace_id: string | null;
 }
 
 export interface ProjectInsert {
@@ -13,7 +11,7 @@ export interface ProjectInsert {
   name: string;
   description?: string | null;
   created_at?: string | null;
-  workspace_id?: number | null;
+  workspace_id?: string | null;
 }
 
 export interface ProjectUpdate {
@@ -21,5 +19,5 @@ export interface ProjectUpdate {
   name?: string;
   description?: string | null;
   created_at?: string | null;
-  workspace_id?: number | null;
+  workspace_id?: string | null;
 }

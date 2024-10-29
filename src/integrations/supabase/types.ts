@@ -123,13 +123,6 @@ export type Database = {
             referencedRelation: "projects"
             referencedColumns: ["project_id"]
           },
-          {
-            foreignKeyName: "crawler_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
         ]
       }
       pages: {
@@ -232,13 +225,6 @@ export type Database = {
             referencedRelation: "runs"
             referencedColumns: ["run_id"]
           },
-          {
-            foreignKeyName: "pages_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
         ]
       }
       personas: {
@@ -283,13 +269,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["project_id"]
-          },
-          {
-            foreignKeyName: "personas_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -362,21 +341,21 @@ export type Database = {
           description: string | null
           name: string
           project_id: string
-          workspace_id: number | null
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
           name: string
           project_id?: string
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
           name?: string
           project_id?: string
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -434,21 +413,21 @@ export type Database = {
           created_at: string
           role: string | null
           user_id: string | null
-          workspace_id: number | null
+          workspace_id: string | null
           workspace_user_id: string
         }
         Insert: {
           created_at?: string
           role?: string | null
           user_id?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
           workspace_user_id?: string
         }
         Update: {
           created_at?: string
           role?: string | null
           user_id?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
           workspace_user_id?: string
         }
         Relationships: [
@@ -465,19 +444,19 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          id: number
+          id: string
           name: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
-          id?: number
+          id?: string
           name?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
-          id?: number
+          id?: string
           name?: string | null
         }
         Relationships: []

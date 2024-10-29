@@ -42,13 +42,6 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "projects";
             referencedColumns: ["project_id"];
-          },
-          {
-            foreignKeyName: "crawler_workspace_id_fkey";
-            columns: ["workspace_id"];
-            isOneToOne: false;
-            referencedRelation: "workspaces";
-            referencedColumns: ["id"];
           }
         ];
       };
@@ -63,13 +56,6 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "projects";
             referencedColumns: ["project_id"];
-          },
-          {
-            foreignKeyName: "pages_run_id_fkey";
-            columns: ["run_id"];
-            isOneToOne: false;
-            referencedRelation: "runs";
-            referencedColumns: ["run_id"];
           }
         ];
       };

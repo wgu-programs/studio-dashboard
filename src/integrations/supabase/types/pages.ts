@@ -19,7 +19,7 @@ export interface Page {
   created_at: string | null;
   crawler_id: string | null;
   status: string | null;
-  workspace_id: number | null;
+  workspace_id: string | null;
 }
 
 export interface PageInsert extends Partial<Omit<Page, 'page_id' | 'url'>> {

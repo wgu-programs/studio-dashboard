@@ -7,12 +7,17 @@ export interface Persona {
   description: string | null;
   metadata: Json | null;
   created_at: string | null;
-  workspace_id: number | null;
+  workspace_id: string | null;
 }
 
-export interface PersonaInsert extends Partial<Omit<Persona, 'persona_id' | 'name'>> {
+export interface PersonaInsert {
   persona_id?: string;
+  project_id?: string | null;
   name: string;
+  description?: string | null;
+  metadata?: Json | null;
+  created_at?: string | null;
+  workspace_id?: string | null;
 }
 
 export interface PersonaUpdate extends Partial<Persona> {}

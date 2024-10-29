@@ -33,7 +33,7 @@ export interface Crawler {
   user_agent?: string | null;
   delay_between_requests?: number | null;
   timeout_seconds?: number | null;
-  workspace_id?: number | null;
+  workspace_id?: string | null;
 }
 
 export interface CrawlerInsert extends Partial<Omit<Crawler, 'crawler_id'>> {
