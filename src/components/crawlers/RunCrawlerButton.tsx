@@ -69,9 +69,9 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
         if (pagesError) throw pagesError;
       } else {
         toast({
-          title: "Warning",
+          title: "Notice",
           description: "No start URLs configured for this crawler",
-          variant: "warning",
+          variant: "default",
         });
       }
 
