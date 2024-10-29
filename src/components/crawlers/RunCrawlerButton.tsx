@@ -15,7 +15,16 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
 
   const handleRunCrawler = async () => {
     try {
-      // First create the run
+      // First get the crawler details to get project_id and workspace_id
+      const { data: crawlerData, error: crawlerError } = await supabase
+        .from("crawler")
+        .select("project_id, workspace_id")
+        .eq("crawler_id", crawlerId)
+        .single();
+
+      if (crawlerError) throw crawlerError;
+
+      // Then create the run
       const { data: runData, error: runError } = await supabase
         .from("runs")
         .insert([
@@ -37,6 +46,8 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
           url,
           crawler_id: crawlerId,
           run_id: runData.run_id,
+          project_id: crawlerData.project_id,
+          workspace_id: crawlerData.workspace_id,
           status: "queued",
         }));
 
