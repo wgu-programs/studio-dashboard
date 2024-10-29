@@ -12,10 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Received request:', req.method);
+    // Log the raw request for debugging
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    console.log('Request method:', req.method);
+    
     const body = await req.json();
-    console.log('Request body:', body);
-
+    console.log('Request body (raw):', JSON.stringify(body, null, 2));
+    
     // Validate required parameters
     if (!body.url) {
       console.error('Missing URL in request body:', body);
@@ -46,14 +49,24 @@ serve(async (req) => {
     const authorMatch = html.match(/<meta[^>]*name="author"[^>]*content="([^"]*)"[^>]*>/i);
     const author = authorMatch ? authorMatch[1].trim() : null;
 
+    const result = {
+      title,
+      description,
+      author,
+      html,
+      status: 'completed'
+    };
+    
+    console.log('Response payload:', JSON.stringify({
+      title,
+      description,
+      author,
+      status: 'completed',
+      htmlLength: html?.length || 0
+    }, null, 2));
+
     return new Response(
-      JSON.stringify({
-        title,
-        description,
-        author,
-        html,
-        status: 'completed'
-      }),
+      JSON.stringify(result),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
