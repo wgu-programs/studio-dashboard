@@ -1,8 +1,8 @@
-CREATE OR REPLACE FUNCTION public.handle_new_page()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
+-- Supabase AI is experimental and may produce incorrect answers
+-- Always verify the output before executing
+
+create
+or replace function public.handle_new_page () returns trigger language plpgsql security definer as $$
 declare
   response_status int;
   payload text;
@@ -27,17 +27,16 @@ begin
   SELECT
     status INTO response_status
   FROM
-    extensions.http((
+    extensions.http(
       'POST',
       'https://tntmojiyzugsvimxcflp.supabase.co/functions/v1/crawl-page',
       ARRAY[
         http_header('Content-Type', 'application/json'),
-        http_header('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRudG1vaml5enVnc3ZpbXhjZmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2OTcyMDIsImV4cCI6MjA0NTI3MzIwMn0.hlL_Jxd0JuHByXzM6LVeZ44LMSf7gVGPOFYOZqJSmuU')
+        http_header('Authorization', 'Bearer ...')
       ],
-      payload::text,  -- Explicitly cast to text and pass as the body
-      0
-    )::http_request);
-
+      payload,
+      5000  -- timeout in milliseconds
+    );
   if response_status != 200 then
     raise warning 'HTTP request failed with status %', response_status;
   end if;
