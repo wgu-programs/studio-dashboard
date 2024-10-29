@@ -26,14 +26,24 @@ serve(async (req) => {
       console.log('Parsed request body:', JSON.stringify(body, null, 2));
     } catch (parseError) {
       console.error('Error parsing request body:', parseError);
-      return new Response(
-        JSON.stringify({ error: `Invalid JSON body: ${parseError.message}` }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      // If JSON parsing fails, try to parse the content-type header as a fallback
+      const contentType = req.headers.get('content-type');
+      if (contentType && contentType.startsWith('{')) {
+        try {
+          body = JSON.parse(contentType);
+          console.log('Parsed from content-type header:', JSON.stringify(body, null, 2));
+        } catch (headerParseError) {
+          console.error('Error parsing content-type header:', headerParseError);
+          return new Response(
+            JSON.stringify({ error: 'Invalid request format' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
     }
     
     // Validate required parameters
-    if (!body.url) {
+    if (!body?.url) {
       console.error('Missing URL in request body:', body);
       return new Response(
         JSON.stringify({ error: 'Missing required parameter: url' }),
