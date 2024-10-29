@@ -33,13 +33,11 @@ export const PageCards = ({ pages }: PageCardsProps) => {
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              page.snapshot_url && (
-                <img
-                  src={page.snapshot_url}
-                  alt={page.title || "Page snapshot"}
-                  className="object-cover w-full h-full"
-                />
-              )
+              <img
+                src={page.snapshot_url || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"}
+                alt={page.title || "Page snapshot"}
+                className="object-cover w-full h-full"
+              />
             )}
           </AspectRatio>
           <CardContent className="p-4">
