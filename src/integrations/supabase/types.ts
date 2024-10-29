@@ -43,7 +43,7 @@ export type Database = {
           status: string | null
           timeout_seconds: number | null
           user_agent: string | null
-          workspace_id: number | null
+          workspace_id: string | null
         }
         Insert: {
           always_download_html_and_css?: boolean | null
@@ -78,7 +78,7 @@ export type Database = {
           status?: string | null
           timeout_seconds?: number | null
           user_agent?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Update: {
           always_download_html_and_css?: boolean | null
@@ -113,7 +113,7 @@ export type Database = {
           status?: string | null
           timeout_seconds?: number | null
           user_agent?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -122,6 +122,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "crawler_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -145,7 +152,7 @@ export type Database = {
           status: string | null
           title: string | null
           url: string
-          workspace_id: number | null
+          workspace_id: string | null
         }
         Insert: {
           author?: string | null
@@ -166,7 +173,7 @@ export type Database = {
           status?: string | null
           title?: string | null
           url: string
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Update: {
           author?: string | null
@@ -187,7 +194,7 @@ export type Database = {
           status?: string | null
           title?: string | null
           url?: string
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -225,6 +232,13 @@ export type Database = {
             referencedRelation: "runs"
             referencedColumns: ["run_id"]
           },
+          {
+            foreignKeyName: "pages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
         ]
       }
       personas: {
@@ -235,7 +249,7 @@ export type Database = {
           name: string
           persona_id: string
           project_id: string | null
-          workspace_id: number | null
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -244,7 +258,7 @@ export type Database = {
           name: string
           persona_id?: string
           project_id?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -253,7 +267,7 @@ export type Database = {
           name?: string
           persona_id?: string
           project_id?: string | null
-          workspace_id?: number | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -269,6 +283,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "personas_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -374,9 +395,11 @@ export type Database = {
           crawler_id: string | null
           description: string | null
           name: string | null
+          project_id: string | null
           run_id: string
           started_at: string | null
           status: string | null
+          workspace_id: string | null
         }
         Insert: {
           archived?: boolean | null
@@ -384,9 +407,11 @@ export type Database = {
           crawler_id?: string | null
           description?: string | null
           name?: string | null
+          project_id?: string | null
           run_id?: string
           started_at?: string | null
           status?: string | null
+          workspace_id?: string | null
         }
         Update: {
           archived?: boolean | null
@@ -394,9 +419,11 @@ export type Database = {
           crawler_id?: string | null
           description?: string | null
           name?: string | null
+          project_id?: string | null
           run_id?: string
           started_at?: string | null
           status?: string | null
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -405,6 +432,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "crawler"
             referencedColumns: ["crawler_id"]
+          },
+          {
+            foreignKeyName: "runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "runs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }

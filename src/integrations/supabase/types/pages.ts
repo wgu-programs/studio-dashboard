@@ -19,7 +19,7 @@ export interface Page {
   created_at: string | null;
   crawler_id: string | null;
   status: string | null;
-  workspace_id: number | null;
+  workspace_id: string | null;
 }
 
 export interface PageInsert {
@@ -40,7 +40,7 @@ export interface PageInsert {
   created_at?: string | null;
   crawler_id?: string | null;
   status?: string | null;
-  workspace_id?: number | null;
+  workspace_id?: string | null;
 }
 
 export interface PageUpdate extends Partial<Page> {}

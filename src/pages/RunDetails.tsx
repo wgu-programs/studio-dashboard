@@ -49,10 +49,7 @@ const RunDetails = () => {
         .eq("run_id", runId);
 
       if (pagesError) throw pagesError;
-      setPages(pagesData?.map(page => ({
-        ...page,
-        workspace_id: page.workspace_id?.toString()
-      })) || []);
+      setPages(pagesData || []);
     } catch (error) {
       toast({
         title: "Error",
