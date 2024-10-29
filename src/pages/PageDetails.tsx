@@ -5,6 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Page } from "@/integrations/supabase/types/pages";
 import { formatDistanceToNow } from "date-fns";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Loader2 } from "lucide-react";
 
 const PageDetails = () => {
   const { pageId } = useParams();
@@ -46,6 +48,22 @@ const PageDetails = () => {
   return (
     <div className="space-y-6">
       <PageTitle>{page.title || "Untitled Page"}</PageTitle>
+
+      <Card className="overflow-hidden">
+        <AspectRatio ratio={16 / 9}>
+          {page.status === "queued" ? (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <img
+              src={page.snapshot_url || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"}
+              alt={page.title || "Page snapshot"}
+              className="object-cover w-full h-full"
+            />
+          )}
+        </AspectRatio>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
