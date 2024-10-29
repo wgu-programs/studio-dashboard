@@ -18,11 +18,20 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
       // First get the crawler details to get project_id and workspace_id
       const { data: crawlerData, error: crawlerError } = await supabase
         .from("crawler")
-        .select("project_id, workspace_id")
+        .select(`
+          project_id,
+          workspace_id,
+          projects (
+            workspace_id
+          )
+        `)
         .eq("crawler_id", crawlerId)
         .single();
 
       if (crawlerError) throw crawlerError;
+
+      // Get the workspace_id either directly from crawler or from its project
+      const workspace_id = crawlerData.workspace_id || crawlerData.projects?.workspace_id;
 
       // Then create the run
       const { data: runData, error: runError } = await supabase
@@ -47,7 +56,7 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
           crawler_id: crawlerId,
           run_id: runData.run_id,
           project_id: crawlerData.project_id,
-          workspace_id: crawlerData.workspace_id,
+          workspace_id: workspace_id,
           status: "queued",
         }));
 
