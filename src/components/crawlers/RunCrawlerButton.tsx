@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRunName } from "@/utils/nameGenerator";
 import { Json } from "@/integrations/supabase/types/json";
+import { PageInsert } from "@/integrations/supabase/types/pages";
 
 interface RunCrawlerButtonProps {
   crawlerId: string;
@@ -51,12 +52,12 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
 
       // Then add all start URLs as pages
       if (Array.isArray(startUrls) && startUrls.length > 0) {
-        const pages = startUrls.map((url: string) => ({
+        const pages: PageInsert[] = startUrls.map((url: string) => ({
           url,
           crawler_id: crawlerId,
           run_id: runData.run_id,
           project_id: crawlerData.project_id,
-          workspace_id: workspace_id,
+          workspace_id: workspace_id ? Number(workspace_id) : null,
           status: "queued",
         }));
 
