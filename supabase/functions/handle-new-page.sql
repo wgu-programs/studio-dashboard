@@ -34,7 +34,7 @@ begin
         http_header('Content-Type', 'application/json'),
         http_header('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRudG1vaml5enVnc3ZpbXhjZmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2OTcyMDIsImV4cCI6MjA0NTI3MzIwMn0.hlL_Jxd0JuHByXzM6LVeZ44LMSf7gVGPOFYOZqJSmuU')
       ],
-      payload,
+      payload::text,  -- Explicitly cast to text and pass as the body
       0
     )::http_request);
 
