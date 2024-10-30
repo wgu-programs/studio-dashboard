@@ -1,5 +1,14 @@
-import { serve } from 'https://deno.land/x/sift@0.5.0/mod.ts';
+/******************************************************************************
+ * @Author                : David Petersen <david.petersen@wgu.edu>           *
+ * @CreatedDate           : 2024-10-30 13:27:46                               *
+ * @LastEditors           : David Petersen <david.petersen@wgu.edu>           *
+ * @LastEditDate          : 2024-10-30 13:27:46                               *
+ * @FilePath              : studio-dashboard/supabase/functions/crawl-page/index.ts*
+ * @CopyRight             : Western Governors University                      *
+ *****************************************************************************/
+
 import { createClient } from 'https://deno.land/x/supabase@1.0.0/mod.ts';
+import { serve } from 'https://deno.land/x/sift@0.5.0/mod.ts';
 
 serve(async (req) => {
   if (req.method !== 'POST') {
