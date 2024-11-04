@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { PageHeader } from "./PageHeader";
+import { withAuth } from "../auth/withAuth";
 
 const Layout = () => {
   return (
@@ -17,4 +18,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default withAuth(Layout);

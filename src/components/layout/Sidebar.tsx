@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useTheme } from "../theme/theme-provider";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarNavigation } from "./SidebarNavigation";
@@ -44,7 +42,6 @@ const Sidebar = () => {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    // Enable REALTIME updates for the profiles table
     const channel = supabase
       .channel('profile-changes')
       .on(
@@ -103,8 +100,7 @@ const Sidebar = () => {
       }`}
     >
       <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-
-      {session && profile ? (
+      {session && profile && (
         <>
           <SidebarNavigation collapsed={collapsed} />
           <SidebarFooter
@@ -113,17 +109,6 @@ const Sidebar = () => {
             onSignOut={handleSignOut}
           />
         </>
-      ) : (
-        <div className="flex-1 p-4">
-          {!collapsed && (
-            <Auth
-              supabaseClient={supabase}
-              appearance={{ theme: ThemeSupa }}
-              theme={theme === "dark" ? "dark" : "light"}
-              providers={[]}
-            />
-          )}
-        </div>
       )}
     </div>
   );
