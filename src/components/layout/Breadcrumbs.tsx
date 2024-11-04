@@ -47,12 +47,27 @@ export const Breadcrumbs = () => {
           data = run?.name;
           break;
         case 'pages':
+          // For pages, we want to get both the page title and its associated run
           const { data: page } = await supabase
             .from('pages')
-            .select('title')
+            .select(`
+              title,
+              run:runs (
+                run_id,
+                name
+              )
+            `)
             .eq('page_id', id)
             .single();
-          data = page?.title;
+          
+          if (page?.run) {
+            // Store the run name for the breadcrumb path
+            setTitles[page.run.run_id] = page.run.name;
+            // Return the page title
+            data = page?.title;
+          } else {
+            data = page?.title;
+          }
           break;
         case 'personas':
           const { data: persona } = await supabase
@@ -91,12 +106,47 @@ export const Breadcrumbs = () => {
 
   const getBreadcrumbs = () => {
     const paths = location.pathname.split('/').filter(Boolean);
-    return paths.map((path, index) => {
-      const url = `/${paths.slice(0, index + 1).join('/')}`;
-      const label = titles[path] || path.charAt(0).toUpperCase() + path.slice(1);
-      const isLast = index === paths.length - 1;
-      return { url, label, isLast };
-    });
+    const breadcrumbs = [];
+    
+    // Special handling for pages - we want to show the run instead
+    if (paths[0] === 'pages') {
+      // Find the page's run information
+      const pageId = paths[1];
+      supabase
+        .from('pages')
+        .select(`
+          run:runs (
+            run_id,
+            name
+          )
+        `)
+        .eq('page_id', pageId)
+        .single()
+        .then(({ data }) => {
+          if (data?.run) {
+            breadcrumbs.push({
+              url: `/runs/${data.run.run_id}`,
+              label: data.run.name || 'Unnamed Run',
+              isLast: false
+            });
+            breadcrumbs.push({
+              url: `/pages/${pageId}`,
+              label: titles[pageId] || 'Loading...',
+              isLast: true
+            });
+          }
+        });
+    } else {
+      // Regular breadcrumb generation for other routes
+      paths.forEach((path, index) => {
+        const url = `/${paths.slice(0, index + 1).join('/')}`;
+        const label = titles[path] || path.charAt(0).toUpperCase() + path.slice(1);
+        const isLast = index === paths.length - 1;
+        breadcrumbs.push({ url, label, isLast });
+      });
+    }
+    
+    return breadcrumbs;
   };
 
   if (location.pathname === '/') return null;

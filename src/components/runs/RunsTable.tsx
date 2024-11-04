@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -86,8 +86,17 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
                   <TableCell className="font-medium">
                     {run.name || "Unnamed Run"}
                   </TableCell>
-                  <TableCell>
-                    {run.crawler?.name || "Unknown Crawler"}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    {run.crawler ? (
+                      <Link 
+                        to={`/crawlers/${run.crawler.crawler_id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {run.crawler.name || "Unnamed Crawler"}
+                      </Link>
+                    ) : (
+                      "No crawler"
+                    )}
                   </TableCell>
                   <TableCell>
                     {run.started_at
