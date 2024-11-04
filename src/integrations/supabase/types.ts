@@ -147,7 +147,7 @@ export type Database = {
           page_id: string
           project_id: string | null
           run_id: string | null
-          snapshot_url: string | null
+          screenshot_url: string | null
           speakable_content: string[] | null
           status: string | null
           title: string | null
@@ -168,7 +168,7 @@ export type Database = {
           page_id?: string
           project_id?: string | null
           run_id?: string | null
-          snapshot_url?: string | null
+          screenshot_url?: string | null
           speakable_content?: string[] | null
           status?: string | null
           title?: string | null
@@ -189,7 +189,7 @@ export type Database = {
           page_id?: string
           project_id?: string | null
           run_id?: string | null
-          snapshot_url?: string | null
+          screenshot_url?: string | null
           speakable_content?: string[] | null
           status?: string | null
           title?: string | null
