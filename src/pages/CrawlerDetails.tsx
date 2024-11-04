@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useOutletContext } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,13 @@ import { Crawler } from "@/integrations/supabase/types/crawler";
 
 const CrawlerDetails = () => {
   const { crawlerId } = useParams();
+  const navigate = useNavigate();
   const [crawler, setCrawler] = useState<Crawler | null>(null);
   const [runs, setRuns] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -22,6 +24,18 @@ const CrawlerDetails = () => {
 
   const fetchCrawler = async () => {
     try {
+      setIsLoading(true);
+      
+      if (!crawlerId) {
+        toast({
+          title: "Error",
+          description: "No crawler ID provided",
+          variant: "destructive",
+        });
+        navigate("/crawlers");
+        return;
+      }
+
       const { data: crawlerData, error: crawlerError } = await supabase
         .from("crawler")
         .select(`
@@ -31,7 +45,19 @@ const CrawlerDetails = () => {
         .eq("crawler_id", crawlerId)
         .single();
 
-      if (crawlerError) throw crawlerError;
+      if (crawlerError) {
+        if (crawlerError.code === "PGRST116") {
+          toast({
+            title: "Error",
+            description: "Crawler not found",
+            variant: "destructive",
+          });
+          navigate("/crawlers");
+          return;
+        }
+        throw crawlerError;
+      }
+
       setCrawler({
         ...crawlerData,
         workspace_id: crawlerData.workspace_id?.toString()
@@ -47,17 +73,22 @@ const CrawlerDetails = () => {
 
       if (runsError) throw runsError;
       setRuns(runsData || []);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to fetch crawler details",
+        description: error.message || "Failed to fetch crawler details",
         variant: "destructive",
       });
+      navigate("/crawlers");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSave = async () => {
     try {
+      if (!crawlerId) return;
+
       const { error } = await supabase
         .from("crawler")
         .update({
@@ -75,23 +106,25 @@ const CrawlerDetails = () => {
       
       setIsEditing(false);
       fetchCrawler();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to update crawler",
+        description: error.message || "Failed to update crawler",
         variant: "destructive",
       });
     }
   };
 
   useEffect(() => {
-    if (crawlerId) {
-      fetchCrawler();
-    }
+    fetchCrawler();
   }, [crawlerId]);
 
-  if (!crawler) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (!crawler) {
+    return null;
   }
 
   return (
