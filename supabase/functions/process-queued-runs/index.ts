@@ -17,6 +17,8 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
+    console.log('Starting process-queued-runs function');
+
     // Find runs that are queued or processing
     const { data: queuedRuns, error: runsError } = await supabase
       .from('runs')
@@ -36,25 +38,30 @@ Deno.serve(async (req) => {
 
       // Update run status to processing if it was queued
       if (run.status === 'queued') {
-        await supabase
+        const { error: updateError } = await supabase
           .from('runs')
           .update({ status: 'processing' })
           .eq('run_id', run.run_id);
+
+        if (updateError) {
+          console.error(`Error updating run status: ${updateError.message}`);
+          continue;
+        }
       }
 
-      // Get all unprocessed pages for this run
+      // Get all queued pages for this run
       const { data: pages, error: pagesError } = await supabase
         .from('pages')
         .select('*')
         .eq('run_id', run.run_id)
-        .is('status', null);
+        .eq('status', 'queued');
 
       if (pagesError) {
         console.error(`Error fetching pages for run ${run.run_id}:`, pagesError);
         continue;
       }
 
-      console.log(`Found ${pages?.length || 0} unprocessed pages for run ${run.run_id}`);
+      console.log(`Found ${pages?.length || 0} queued pages for run ${run.run_id}`);
 
       // Process each page
       for (const page of pages || []) {
@@ -70,18 +77,47 @@ Deno.serve(async (req) => {
           break;
         }
 
-        // Invoke the crawl-page function for each page
-        console.log(`Invoking crawl-page function for page ${page.page_id}`);
-        const { data: response, error: invokeError } = await supabase.functions.invoke('crawl-page', {
-          body: { record: { page_id: page.page_id, url: page.url } }
-        });
+        // Update page status to processing
+        const { error: pageUpdateError } = await supabase
+          .from('pages')
+          .update({ status: 'processing' })
+          .eq('page_id', page.page_id);
 
-        if (invokeError) {
-          console.error(`Failed to process page ${page.page_id}:`, invokeError);
+        if (pageUpdateError) {
+          console.error(`Error updating page status: ${pageUpdateError.message}`);
           continue;
         }
 
-        console.log(`Successfully invoked crawl-page for page ${page.page_id}:`, response);
+        // Invoke the crawl-page function for each page
+        console.log(`Invoking crawl-page function for page ${page.page_id} with URL ${page.url}`);
+        
+        try {
+          const { data: response, error: invokeError } = await supabase.functions.invoke('crawl-page', {
+            body: { record: { page_id: page.page_id, url: page.url } }
+          });
+
+          if (invokeError) {
+            console.error(`Failed to invoke crawl-page for page ${page.page_id}:`, invokeError);
+            
+            // Update page status to failed
+            await supabase
+              .from('pages')
+              .update({ status: 'failed' })
+              .eq('page_id', page.page_id);
+              
+            continue;
+          }
+
+          console.log(`Successfully invoked crawl-page for page ${page.page_id}:`, response);
+        } catch (error) {
+          console.error(`Error invoking crawl-page for page ${page.page_id}:`, error);
+          
+          // Update page status to failed
+          await supabase
+            .from('pages')
+            .update({ status: 'failed' })
+            .eq('page_id', page.page_id);
+        }
 
         // Add a small delay between requests to avoid overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -93,10 +129,11 @@ Deno.serve(async (req) => {
         .select('page_id, status')
         .eq('run_id', run.run_id);
 
-      const allPagesCompleted = remainingPages?.every(page => page.status === 'completed');
+      const allPagesCompleted = remainingPages?.every(page => 
+        page.status === 'completed' || page.status === 'failed'
+      );
       
       if (allPagesCompleted && remainingPages?.length > 0) {
-        // Use UTC timestamp for completed_at
         const completed_at = new Date().toISOString();
         await supabase
           .from('runs')
