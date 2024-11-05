@@ -27,13 +27,16 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
   const handleStartCrawler = async (crawler: any, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
+      const now = new Date();
+      const utcTimestamp = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
+      
       const { error } = await supabase
         .from("runs")
         .insert([
           {
             crawler_id: crawler.crawler_id,
             status: "queued",
-            started_at: new Date().toISOString(),
+            started_at: utcTimestamp,
             name: generateRunName(),
           },
         ]);

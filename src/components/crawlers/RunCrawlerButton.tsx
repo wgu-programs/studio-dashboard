@@ -33,6 +33,9 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
       // Get the workspace_id either directly from crawler or from its project
       const workspace_id = crawlerData.workspace_id || crawlerData.projects?.workspace_id;
 
+      const now = new Date();
+      const utcTimestamp = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
+
       // Create the run
       const { data: runData, error: runError } = await supabase
         .from("runs")
@@ -42,7 +45,7 @@ export const RunCrawlerButton = ({ crawlerId, startUrls, onRunCreated }: RunCraw
             project_id: crawlerData.project_id,
             workspace_id: workspace_id,
             status: "queued",
-            started_at: new Date().toISOString(),
+            started_at: utcTimestamp,
             name: generateRunName(),
           },
         ])
