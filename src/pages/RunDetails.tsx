@@ -176,10 +176,12 @@ const RunDetails = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-4">
-            <TabsList>
-              <TabsTrigger value="cards">Cards</TabsTrigger>
-              <TabsTrigger value="table">Table</TabsTrigger>
-            </TabsList>
+            <Tabs defaultValue="cards">
+              <TabsList>
+                <TabsTrigger value="cards">Cards</TabsTrigger>
+                <TabsTrigger value="table">Table</TabsTrigger>
+              </TabsList>
+            </Tabs>
             <div className="flex gap-4 text-sm">
               <div>Queued: {pageCounts?.queued || 0}</div>
               <div>Complete: {pageCounts?.completed || 0}</div>
