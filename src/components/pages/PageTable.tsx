@@ -7,7 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Page {
   page_id: string;
@@ -16,6 +18,7 @@ interface Page {
   description: string | null;
   status: string | null;
   snapshot_url: string | null;
+  run_id: string;
 }
 
 interface PageTableProps {
@@ -25,32 +28,73 @@ interface PageTableProps {
 export const PageTable = ({ pages }: PageTableProps) => {
   const navigate = useNavigate();
 
+  // Get the run_id from the first page (assuming all pages belong to the same run)
+  const runId = pages[0]?.run_id;
+
+  // Fetch page counts for the run
+  const { data: pageCounts } = useQuery({
+    queryKey: ['runPageCounts', runId],
+    queryFn: async () => {
+      if (!runId) return null;
+      
+      const { data, error } = await supabase
+        .from('pages')
+        .select('status')
+        .eq('run_id', runId);
+
+      if (error) throw error;
+
+      return {
+        completed: data.filter(page => page.status === 'completed').length,
+        queued: data.filter(page => page.status === 'queued').length,
+        failed: data.filter(page => page.status === 'failed').length,
+        total: data.length
+      };
+    },
+    enabled: !!runId,
+  });
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>URL</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Description</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {pages.map((page) => (
-          <TableRow 
-            key={page.page_id}
-            className="cursor-pointer hover:bg-muted/50"
-            onClick={() => navigate(`/pages/${page.page_id}`)}
-          >
-            <TableCell className="font-medium">{page.title || "Untitled"}</TableCell>
-            <TableCell>{page.url}</TableCell>
-            <TableCell>{page.status}</TableCell>
-            <TableCell className="max-w-md truncate">
-              {page.description || "No description"}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Pages</CardTitle>
+        <div className="flex gap-4 text-sm">
+          <div>Queued: {pageCounts?.queued || 0}</div>
+          <div>Complete: {pageCounts?.completed || 0}</div>
+          {(pageCounts?.failed || 0) > 0 && (
+            <div className="text-red-500">Failed: {pageCounts?.failed}</div>
+          )}
+          <div>Total: {pageCounts?.total || 0}</div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>URL</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Description</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pages.map((page) => (
+              <TableRow 
+                key={page.page_id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => navigate(`/pages/${page.page_id}`)}
+              >
+                <TableCell className="font-medium">{page.title || "Untitled"}</TableCell>
+                <TableCell>{page.url}</TableCell>
+                <TableCell>{page.status}</TableCell>
+                <TableCell className="max-w-md truncate">
+                  {page.description || "No description"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };
