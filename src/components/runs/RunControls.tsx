@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { PauseIcon, StopIcon } from "lucide-react";
+import { PauseIcon, SquareX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -53,7 +53,7 @@ export const RunControls = ({ runId, status }: RunControlsProps) => {
         size="sm"
         onClick={() => updateRunStatus("cancelled")}
       >
-        <StopIcon className="h-4 w-4" />
+        <SquareX className="h-4 w-4" />
         <span className="ml-2">Stop</span>
       </Button>
     </div>
