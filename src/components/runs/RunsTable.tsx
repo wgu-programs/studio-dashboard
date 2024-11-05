@@ -33,17 +33,19 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 		queryFn: async () => {
 			const { data, error } = await supabase
 				.from('pages')
-				.select('run_id, count', { count: 'exact', head: false })
-				.in('run_id', runs.map(run => run.run_id))
-				.groupBy('run_id');
+				.select('run_id, status')
+				.in('run_id', runs.map(run => run.run_id));
 
 			if (error) throw error;
-			
-			// Create an object with run_id as key and count as value
-			const counts: Record<string, number> = {};
+
+			// Create an object with run_id as key and counts as value
+			const counts: Record<string, { total: number; queued: number }> = {};
 			for (const run of runs) {
-				const pageCount = data?.find(d => d.run_id === run.run_id);
-				counts[run.run_id] = pageCount ? parseInt(pageCount.count) : 0;
+				const runPages = data?.filter(d => d.run_id === run.run_id) || [];
+				counts[run.run_id] = {
+					total: runPages.length,
+					queued: runPages.filter(page => page.status === 'queued').length
+				};
 			}
 			return counts;
 		},
@@ -100,7 +102,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 								<TableHead>Crawler</TableHead>
 								<TableHead>Started</TableHead>
 								<TableHead>Completed</TableHead>
-								<TableHead>Pages</TableHead>
+								<TableHead>Pages (Queued/Total)</TableHead>
 								<TableHead>Status</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -139,7 +141,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 											: 'Not completed'}
 									</TableCell>
 									<TableCell>
-										{pageCounts?.[run.run_id] || 0}
+										{pageCounts?.[run.run_id]?.queued || 0}/{pageCounts?.[run.run_id]?.total || 0}
 									</TableCell>
 									<TableCell>
 										<div className='flex items-center gap-2'>
