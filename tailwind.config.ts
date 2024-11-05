@@ -26,12 +26,12 @@ export default {
         foreground: "hsl(var(--foreground))",
         sidebar: {
           background: {
-            DEFAULT: "#FFFFFF", // Pure white for light mode
-            dark: "#0F172A"
+            DEFAULT: "linear-gradient(to bottom, #f5f0e6, #f0e6d3)", // Light tan gradient
+            dark: "#030712" // Even darker than default dark mode
           },
           hover: {
-            DEFAULT: "#F1F5F9",
-            dark: "#1E293B"
+            DEFAULT: "#e6dcc8",
+            dark: "#111827"
           }
         },
         primary: {

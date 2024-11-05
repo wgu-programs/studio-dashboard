@@ -96,7 +96,8 @@ const Sidebar = () => {
   return (
     <div
       className={cn(
-        "flex h-screen flex-col bg-background transition-all duration-300",
+        "flex h-screen flex-col transition-all duration-300",
+        "bg-gradient-to-b from-[#f5f0e6] to-[#f0e6d3] dark:bg-[#030712]",
         collapsed ? "w-[70px]" : "w-[240px]"
       )}
     >
