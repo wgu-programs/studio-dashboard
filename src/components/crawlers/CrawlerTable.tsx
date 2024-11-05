@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -63,48 +62,35 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
             <TableHead>Name</TableHead>
             <TableHead>Project</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Runs</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {crawlers.map((crawler) => {
-            const latestRun = crawler.runs
-              ?.filter((run: any) => showArchived || !run.archived)
-              ?.sort((a: any, b: any) => 
-                new Date(b.started_at || 0).getTime() - new Date(a.started_at || 0).getTime()
-              )[0];
-
-            return (
-              <TableRow 
-                key={crawler.crawler_id}
-                className="cursor-pointer"
-                onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
-              >
-                <TableCell className="font-medium">
-                  {crawler.name || "Unnamed Crawler"}
-                </TableCell>
-                <TableCell>
-                  {crawler.project?.name || "No project"}
-                </TableCell>
-                <TableCell>{crawler.description || "No description"}</TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {latestRun ? "Has previous runs" : "No runs"}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => handleStartCrawler(crawler, e)}
-                    >
-                      <PlayIcon className="h-4 w-4 mr-2" />
-                      Start Run
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {crawlers.map((crawler) => (
+            <TableRow 
+              key={crawler.crawler_id}
+              className="cursor-pointer"
+              onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
+            >
+              <TableCell className="font-medium">
+                {crawler.name || "Unnamed Crawler"}
+              </TableCell>
+              <TableCell>
+                {crawler.project?.name || "No project"}
+              </TableCell>
+              <TableCell>{crawler.description || "No description"}</TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => handleStartCrawler(crawler, e)}
+                >
+                  <PlayIcon className="h-4 w-4 mr-2" />
+                  Start Run
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
           {crawlers.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="text-center text-muted-foreground">
