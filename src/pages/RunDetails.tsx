@@ -4,9 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { RunDetailsCard } from "@/components/runs/RunDetailsCard";
 import { CrawlerInfoCard } from "@/components/runs/CrawlerInfoCard";
 import { PagesSection } from "@/components/runs/PagesSection";
+import { RunControls } from "@/components/runs/RunControls";
+import { useOutletContext } from "react-router-dom";
 
 const RunDetails = () => {
   const { runId } = useParams();
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
 
   const { data: run } = useQuery({
     queryKey: ['run', runId],
@@ -78,6 +83,10 @@ const RunDetails = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <PageTitle>{run.name || "Unnamed Run"}</PageTitle>
+        <RunControls runId={run.run_id} status={run.status} />
+      </div>
       <div className="grid gap-6 md:grid-cols-2">
         <RunDetailsCard run={run} />
         <CrawlerInfoCard crawler={run.crawler} />
