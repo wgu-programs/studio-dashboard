@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import { LayoutDashboard, Folder, Archive, Play, User, CheckSquare, Users } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 interface SidebarNavigationProps {
@@ -10,7 +9,6 @@ interface SidebarNavigationProps {
 
 export const SidebarNavigation = ({ collapsed }: SidebarNavigationProps) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const links = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard", shortcut: "⌘1" },
@@ -30,17 +28,13 @@ export const SidebarNavigation = ({ collapsed }: SidebarNavigationProps) => {
           event.preventDefault();
           const link = links[num - 1];
           navigate(link.to);
-          toast({
-            title: "Navigation",
-            description: `Navigated to ${link.label}`,
-          });
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, toast]);
+  }, [navigate]);
 
   return (
     <nav className="flex-1 p-4 space-y-2">
