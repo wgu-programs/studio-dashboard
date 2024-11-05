@@ -92,7 +92,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 											<Link
 												to={`/crawlers/${run.crawler.crawler_id}`}
 												className='text-primary hover:underline'>
-												{JSON.stringify(run.crawler) || 'Unnamed Crawler'}
+												{ run.crawler)|| 'Unnamed Crawler'}
 											</Link>
 										) : (
 											'No crawler'
