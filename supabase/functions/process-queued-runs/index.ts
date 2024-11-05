@@ -70,22 +70,18 @@ Deno.serve(async (req) => {
           break;
         }
 
-        // Trigger the crawl-page function for each page
-        const response = await fetch(
-          `${Deno.env.get('SUPABASE_URL')}/functions/v1/crawl-page`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-            },
-            body: JSON.stringify({ pageId: page.page_id }),
-          }
-        );
+        // Invoke the crawl-page function for each page
+        console.log(`Invoking crawl-page function for page ${page.page_id}`);
+        const { data: response, error: invokeError } = await supabase.functions.invoke('crawl-page', {
+          body: { record: { page_id: page.page_id, url: page.url } }
+        });
 
-        if (!response.ok) {
-          console.error(`Failed to process page ${page.page_id}: ${await response.text()}`);
+        if (invokeError) {
+          console.error(`Failed to process page ${page.page_id}:`, invokeError);
+          continue;
         }
+
+        console.log(`Successfully invoked crawl-page for page ${page.page_id}:`, response);
 
         // Add a small delay between requests to avoid overwhelming the system
         await new Promise(resolve => setTimeout(resolve, 1000));
