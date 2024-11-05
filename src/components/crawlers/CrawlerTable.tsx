@@ -95,7 +95,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                   className="cursor-pointer"
                   onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
                 >
-                  <TableCell className="font-medium pl-8 w-[200px]">
+                  <TableCell className="font-medium w-[200px]">
                     {crawler.name || "Unnamed Crawler"}
                   </TableCell>
                   <TableCell>{crawler.description || "No description"}</TableCell>
