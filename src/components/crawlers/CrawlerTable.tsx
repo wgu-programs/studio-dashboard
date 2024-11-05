@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pause, Play, Square, Archive, Play as PlayIcon } from "lucide-react";
+import { Play as PlayIcon } from "lucide-react";
 import { generateRunName } from "@/utils/nameGenerator";
 
 interface CrawlerTableProps {
@@ -23,35 +23,6 @@ interface CrawlerTableProps {
 export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: CrawlerTableProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const handleRunAction = async (runId: string, action: 'pause' | 'stop') => {
-    try {
-      const updates = {
-        status: action === 'pause' ? 'paused' : 'stopped',
-        ...(action === 'stop' ? { completed_at: new Date().toISOString() } : {}),
-      };
-
-      const { error } = await supabase
-        .from('runs')
-        .update(updates)
-        .eq('run_id', runId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `Run ${action}ed successfully`,
-      });
-
-      onRunStatusChange();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: `Failed to ${action} run`,
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleStartCrawler = async (crawler: any) => {
     try {
@@ -131,33 +102,14 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                   )}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleStartCrawler(crawler)}
-                    >
-                      <PlayIcon className="h-4 w-4" />
-                    </Button>
-                    {latestRun && latestRun.status !== 'stopped' && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleRunAction(latestRun.run_id, 'pause')}
-                        >
-                          {latestRun.status === 'paused' ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleRunAction(latestRun.run_id, 'stop')}
-                        >
-                          <Square className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleStartCrawler(crawler)}
+                  >
+                    <PlayIcon className="h-4 w-4 mr-2" />
+                    Start Run
+                  </Button>
                 </TableCell>
               </TableRow>
             );
