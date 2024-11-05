@@ -26,7 +26,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         sidebar: {
           background: {
-            DEFAULT: "#ffffff",
+            DEFAULT: "#FFFFFF", // Pure white for light mode
             dark: "#0F172A"
           },
           hover: {
