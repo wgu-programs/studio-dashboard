@@ -94,19 +94,22 @@ Deno.serve(async (req) => {
       // Check if all pages are processed and update run status accordingly
       const { data: remainingPages } = await supabase
         .from('pages')
-        .select('page_id')
-        .eq('run_id', run.run_id)
-        .is('status', null);
+        .select('page_id, status')
+        .eq('run_id', run.run_id);
 
-      if (!remainingPages?.length) {
+      const allPagesCompleted = remainingPages?.every(page => page.status === 'completed');
+      
+      if (allPagesCompleted && remainingPages?.length > 0) {
+        // Use UTC timestamp for completed_at
+        const completed_at = new Date().toISOString();
         await supabase
           .from('runs')
           .update({ 
             status: 'completed',
-            completed_at: new Date().toISOString()
+            completed_at
           })
           .eq('run_id', run.run_id);
-        console.log(`Run ${run.run_id} completed`);
+        console.log(`Run ${run.run_id} completed at ${completed_at}`);
       }
     }
 
