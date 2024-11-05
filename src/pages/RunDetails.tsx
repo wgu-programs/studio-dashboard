@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useOutletContext } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Run } from "@/integrations/supabase/types/runs";
-import { Crawler } from "@/integrations/supabase/types/crawler";
-import { Page } from "@/integrations/supabase/types/pages";
-import { useQuery } from "@tanstack/react-query";
 import { RunControls } from "@/components/runs/RunControls";
 import { RunDetailsCard } from "@/components/runs/RunDetailsCard";
 import { CrawlerInfoCard } from "@/components/runs/CrawlerInfoCard";
 import { PagesSection } from "@/components/runs/PagesSection";
+import { Run } from "@/integrations/supabase/types/runs";
+import { Crawler } from "@/integrations/supabase/types/crawler";
+import { Page } from "@/integrations/supabase/types/pages";
+import { useQuery } from "@tanstack/react-query";
 
 interface RunWithCrawler extends Run {
   crawler: Partial<Crawler> | null;
@@ -24,7 +24,8 @@ const RunDetails = () => {
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
   }>();
 
-  const { data: pageCounts } = useQuery({
+  // Fetch page counts for the run
+  const { data: pageCounts, refetch: refetchPageCounts } = useQuery({
     queryKey: ['runPageCounts', runId],
     queryFn: async () => {
       if (!runId) return null;
@@ -86,7 +87,7 @@ const RunDetails = () => {
       fetchRun();
 
       // Set up real-time subscription for run status updates
-      const subscription = supabase
+      const runSubscription = supabase
         .channel(`run-${runId}`)
         .on(
           'postgres_changes',
@@ -104,8 +105,35 @@ const RunDetails = () => {
         )
         .subscribe();
 
+      // Set up real-time subscription for pages updates
+      const pagesSubscription = supabase
+        .channel(`pages-${runId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'pages',
+            filter: `run_id=eq.${runId}`
+          },
+          async () => {
+            // Refetch page counts when pages are updated
+            await refetchPageCounts();
+            // Also refresh the pages list
+            const { data } = await supabase
+              .from("pages")
+              .select("*")
+              .eq("run_id", runId);
+            if (data) {
+              setPages(data);
+            }
+          }
+        )
+        .subscribe();
+
       return () => {
-        subscription.unsubscribe();
+        runSubscription.unsubscribe();
+        pagesSubscription.unsubscribe();
       };
     }
   }, [runId]);
