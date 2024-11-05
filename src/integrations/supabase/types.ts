@@ -40,7 +40,6 @@ export type Database = {
           project_id: string | null
           retry_count: number | null
           start_urls: Json | null
-          status: string | null
           timeout_seconds: number | null
           user_agent: string | null
           workspace_id: string | null
@@ -75,7 +74,6 @@ export type Database = {
           project_id?: string | null
           retry_count?: number | null
           start_urls?: Json | null
-          status?: string | null
           timeout_seconds?: number | null
           user_agent?: string | null
           workspace_id?: string | null
@@ -110,7 +108,6 @@ export type Database = {
           project_id?: string | null
           retry_count?: number | null
           start_urls?: Json | null
-          status?: string | null
           timeout_seconds?: number | null
           user_agent?: string | null
           workspace_id?: string | null
