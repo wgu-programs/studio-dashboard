@@ -6,6 +6,7 @@ import { Session } from "@supabase/supabase-js";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { SidebarFooter } from "./SidebarFooter";
+import { WorkspaceList } from "../workspace/WorkspaceList";
 import { type Profile } from "@/integrations/supabase/types/profiles";
 
 const Sidebar = () => {
@@ -101,6 +102,10 @@ const Sidebar = () => {
       {session && profile && (
         <>
           <SidebarNavigation collapsed={collapsed} />
+          <div className="border-t border-gray-200 dark:border-gray-800">
+            <WorkspaceList collapsed={collapsed} />
+          </div>
+          <div className="flex-1" />
           <SidebarFooter
             collapsed={collapsed}
             profile={profile}
