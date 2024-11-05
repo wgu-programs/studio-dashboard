@@ -65,7 +65,7 @@ export const CrawlerDetailsCard = ({
           <div className="space-y-4">
             <div>
               <Label>Project</Label>
-              {crawler.project ? (
+              {crawler.project_id && crawler.project ? (
                 <Link 
                   to={`/projects/${crawler.project_id}`}
                   className="text-sm text-blue-500 hover:underline block"
@@ -82,14 +82,16 @@ export const CrawlerDetailsCard = ({
                 {crawler.description || "No description"}
               </p>
             </div>
-            <div className="space-y-2">
-              <Label>Start URLs</Label>
-              <StartUrlsList
-                crawlerId={crawler.crawler_id!}
-                initialUrls={crawler.start_urls}
-                onUpdate={onUpdate}
-              />
-            </div>
+            {crawler.crawler_id && (
+              <div className="space-y-2">
+                <Label>Start URLs</Label>
+                <StartUrlsList
+                  crawlerId={crawler.crawler_id}
+                  initialUrls={crawler.start_urls}
+                  onUpdate={onUpdate}
+                />
+              </div>
+            )}
           </div>
         )}
       </CardContent>
