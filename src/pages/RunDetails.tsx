@@ -10,6 +10,7 @@ import { Page } from "@/integrations/supabase/types/pages";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageTable } from "@/components/pages/PageTable";
 import { PageCards } from "@/components/pages/PageCards";
+import { useQuery } from "@tanstack/react-query";
 
 interface RunWithCrawler extends Run {
   crawler: Partial<Crawler> | null;
@@ -23,6 +24,29 @@ const RunDetails = () => {
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
   }>();
+
+  // Fetch page counts for the run
+  const { data: pageCounts } = useQuery({
+    queryKey: ['runPageCounts', runId],
+    queryFn: async () => {
+      if (!runId) return null;
+      
+      const { data, error } = await supabase
+        .from('pages')
+        .select('status')
+        .eq('run_id', runId);
+
+      if (error) throw error;
+
+      return {
+        completed: data.filter(page => page.status === 'completed').length,
+        queued: data.filter(page => page.status === 'queued').length,
+        failed: data.filter(page => page.status === 'failed').length,
+        total: data.length
+      };
+    },
+    enabled: !!runId,
+  });
 
   const fetchRun = async () => {
     try {
@@ -151,11 +175,21 @@ const RunDetails = () => {
           <CardTitle>Pages</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="cards">
+          <div className="flex items-center justify-between mb-4">
             <TabsList>
               <TabsTrigger value="cards">Cards</TabsTrigger>
               <TabsTrigger value="table">Table</TabsTrigger>
             </TabsList>
+            <div className="flex gap-4 text-sm">
+              <div>Queued: {pageCounts?.queued || 0}</div>
+              <div>Complete: {pageCounts?.completed || 0}</div>
+              {(pageCounts?.failed || 0) > 0 && (
+                <div className="text-red-500">Failed: {pageCounts?.failed}</div>
+              )}
+              <div>Total: {pageCounts?.total || 0}</div>
+            </div>
+          </div>
+          <Tabs defaultValue="cards">
             <TabsContent value="cards">
               <PageCards pages={pages} />
             </TabsContent>
