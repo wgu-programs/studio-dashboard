@@ -26,16 +26,6 @@ const CrawlerDetails = () => {
     try {
       setIsLoading(true);
       
-      if (!crawlerId) {
-        toast({
-          title: "Error",
-          description: "No crawler ID provided",
-          variant: "destructive",
-        });
-        navigate("/crawlers");
-        return;
-      }
-
       const { data: crawlerData, error: crawlerError } = await supabase
         .from("crawler")
         .select(`
@@ -132,11 +122,16 @@ const CrawlerDetails = () => {
   };
 
   useEffect(() => {
-    if (crawlerId) {
-      fetchCrawler();
-    } else {
+    if (!crawlerId) {
+      toast({
+        title: "Error",
+        description: "No crawler ID provided",
+        variant: "destructive",
+      });
       navigate("/crawlers");
+      return;
     }
+    fetchCrawler();
   }, [crawlerId]);
 
   if (isLoading) {
