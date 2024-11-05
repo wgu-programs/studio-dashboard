@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useOutletContext, Link } from "react-router-dom";
+import { useParams, useOutletContext } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDistanceToNow } from "date-fns";
 import { Run } from "@/integrations/supabase/types/runs";
 import { Crawler } from "@/integrations/supabase/types/crawler";
 import { Page } from "@/integrations/supabase/types/pages";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageTable } from "@/components/pages/PageTable";
-import { PageCards } from "@/components/pages/PageCards";
 import { useQuery } from "@tanstack/react-query";
+import { RunControls } from "@/components/runs/RunControls";
+import { RunDetailsCard } from "@/components/runs/RunDetailsCard";
+import { CrawlerInfoCard } from "@/components/runs/CrawlerInfoCard";
+import { PagesSection } from "@/components/runs/PagesSection";
 
 interface RunWithCrawler extends Run {
   crawler: Partial<Crawler> | null;
@@ -25,7 +24,6 @@ const RunDetails = () => {
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
   }>();
 
-  // Fetch page counts for the run
   const { data: pageCounts } = useQuery({
     queryKey: ['runPageCounts', runId],
     queryFn: async () => {
@@ -95,112 +93,17 @@ const RunDetails = () => {
 
   return (
     <div className="space-y-6">
-      <PageTitle>{run.name || "Unnamed Run"}</PageTitle>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Run Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-medium">Status</h3>
-              <p className="text-sm text-muted-foreground capitalize">{run.status}</p>
-            </div>
-            <div>
-              <h3 className="font-medium">Started</h3>
-              <p className="text-sm text-muted-foreground">
-                {run.started_at
-                  ? formatDistanceToNow(new Date(run.started_at), { addSuffix: true })
-                  : "Not started"}
-              </p>
-            </div>
-            {run.completed_at && (
-              <div>
-                <h3 className="font-medium">Completed</h3>
-                <p className="text-sm text-muted-foreground">
-                  {formatDistanceToNow(new Date(run.completed_at), { addSuffix: true })}
-                </p>
-              </div>
-            )}
-            {run.description && (
-              <div>
-                <h3 className="font-medium">Description</h3>
-                <p className="text-sm text-muted-foreground">{run.description}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Crawler Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {run.crawler ? (
-              <>
-                <div>
-                  <h3 className="font-medium">Name</h3>
-                  <Link 
-                    to={`/crawlers/${run.crawler.crawler_id}`}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    {run.crawler.name || "Unnamed Crawler"}
-                  </Link>
-                </div>
-                <div>
-                  <h3 className="font-medium">Status</h3>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {run.crawler.status}
-                  </p>
-                </div>
-                {run.crawler.description && (
-                  <div>
-                    <h3 className="font-medium">Description</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {run.crawler.description}
-                    </p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">No crawler information available</p>
-            )}
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-between">
+        <PageTitle>{run.name || "Unnamed Run"}</PageTitle>
+        <RunControls runId={run.run_id} status={run.status} />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Pages</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <Tabs defaultValue="cards">
-              <TabsList>
-                <TabsTrigger value="cards">Cards</TabsTrigger>
-                <TabsTrigger value="table">Table</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <div className="flex gap-4 text-sm">
-              <div>Queued: {pageCounts?.queued || 0}</div>
-              <div>Complete: {pageCounts?.completed || 0}</div>
-              {(pageCounts?.failed || 0) > 0 && (
-                <div className="text-red-500">Failed: {pageCounts?.failed}</div>
-              )}
-              <div>Total: {pageCounts?.total || 0}</div>
-            </div>
-          </div>
-          <Tabs defaultValue="cards">
-            <TabsContent value="cards">
-              <PageCards pages={pages} />
-            </TabsContent>
-            <TabsContent value="table">
-              <PageTable pages={pages} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <RunDetailsCard run={run} />
+        <CrawlerInfoCard crawler={run.crawler} />
+      </div>
+
+      <PagesSection pages={pages} pageCounts={pageCounts} />
     </div>
   );
 };
