@@ -7,6 +7,7 @@ import { NewCrawlerDialog } from "@/components/crawlers/NewCrawlerDialog";
 
 const Crawlers = () => {
   const [crawlers, setCrawlers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
@@ -14,6 +15,7 @@ const Crawlers = () => {
 
   const fetchCrawlers = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from("crawler")
         .select(`
@@ -25,18 +27,25 @@ const Crawlers = () => {
 
       if (error) throw error;
       setCrawlers(data || []);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error fetching crawlers:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch crawlers",
+        description: "Failed to fetch crawlers. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCrawlers();
   }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">

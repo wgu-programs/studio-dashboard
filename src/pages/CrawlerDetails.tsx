@@ -58,10 +58,17 @@ const CrawlerDetails = () => {
         throw crawlerError;
       }
 
-      setCrawler({
-        ...crawlerData,
-        workspace_id: crawlerData.workspace_id?.toString()
-      });
+      if (!crawlerData) {
+        toast({
+          title: "Error",
+          description: "Crawler not found",
+          variant: "destructive",
+        });
+        navigate("/crawlers");
+        return;
+      }
+
+      setCrawler(crawlerData);
       setName(crawlerData.name || "");
       setDescription(crawlerData.description || "");
 
@@ -74,6 +81,7 @@ const CrawlerDetails = () => {
       if (runsError) throw runsError;
       setRuns(runsData || []);
     } catch (error: any) {
+      console.error("Error fetching crawler:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch crawler details",
@@ -87,7 +95,14 @@ const CrawlerDetails = () => {
 
   const handleSave = async () => {
     try {
-      if (!crawlerId) return;
+      if (!crawlerId) {
+        toast({
+          title: "Error",
+          description: "No crawler ID provided",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const { error } = await supabase
         .from("crawler")
@@ -107,6 +122,7 @@ const CrawlerDetails = () => {
       setIsEditing(false);
       fetchCrawler();
     } catch (error: any) {
+      console.error("Error updating crawler:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to update crawler",
