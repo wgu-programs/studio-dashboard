@@ -4,9 +4,9 @@ interface SidebarHeaderProps {
 
 export const SidebarHeader = ({ collapsed }: SidebarHeaderProps) => {
   return (
-    <div className="flex h-[60px] items-center px-6">
+    <div className="p-4">
       {!collapsed && (
-        <h1 className="text-lg font-semibold tracking-tight">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           WGU Studio
         </h1>
       )}

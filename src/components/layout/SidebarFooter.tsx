@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarControls } from "./SidebarControls";
-import { cn } from "@/lib/utils";
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -24,16 +23,15 @@ export const SidebarFooter = ({
   };
 
   return (
-    <div className="mt-auto border-t">
+    <div className="mt-auto">
       <NavLink
         to="/profile"
         className={({ isActive }) =>
-          cn(
-            "flex items-center gap-3 p-3",
+          `w-full flex items-center gap-3 px-4 py-2 text-sm ${
             isActive
-              ? "bg-secondary text-secondary-foreground"
-              : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
-          )
+              ? "bg-gray-100 dark:bg-gray-800/50 text-gray-900 dark:text-gray-300"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50"
+          } rounded-lg transition-colors`
         }
       >
         <Avatar className="h-8 w-8">
@@ -41,11 +39,9 @@ export const SidebarFooter = ({
           <AvatarFallback>{getInitials()}</AvatarFallback>
         </Avatar>
         {!collapsed && (
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {profile?.first_name} {profile?.last_name}
-            </span>
-          </div>
+          <span>
+            {profile?.first_name} {profile?.last_name}
+          </span>
         )}
       </NavLink>
       <SidebarControls 

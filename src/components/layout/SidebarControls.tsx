@@ -1,7 +1,6 @@
 import { LogOut, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useTheme } from "../theme/theme-provider";
-import { cn } from "@/lib/utils";
 
 interface SidebarControlsProps {
   collapsed: boolean;
@@ -17,44 +16,44 @@ export const SidebarControls = ({
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="p-3 flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setCollapsed(!collapsed)}
-        className={cn(
-          "h-8 w-8",
-          collapsed ? "rotate-180" : ""
+    <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+      <ToggleGroup type="single" className="justify-between w-full">
+        <ToggleGroupItem
+          value="collapse"
+          onClick={() => setCollapsed(!collapsed)}
+          className="data-[state=on]:bg-transparent"
+        >
+          {collapsed ? (
+            <ChevronRight className="h-5 w-5" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
+        </ToggleGroupItem>
+
+        {!collapsed && (
+          <>
+            <ToggleGroupItem
+              value="theme"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="data-[state=on]:bg-transparent"
+            >
+              {theme === "light" ? (
+                <Moon className="h-5 w-5" />
+              ) : (
+                <Sun className="h-5 w-5" />
+              )}
+            </ToggleGroupItem>
+
+            <ToggleGroupItem
+              value="signout"
+              onClick={onSignOut}
+              className="data-[state=on]:bg-transparent text-red-500 hover:text-red-700"
+            >
+              <LogOut className="h-5 w-5" />
+            </ToggleGroupItem>
+          </>
         )}
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-
-      {!collapsed && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="h-8 w-8"
-          >
-            {theme === "light" ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )}
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onSignOut}
-            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20"
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </>
-      )}
+      </ToggleGroup>
     </div>
   );
 };

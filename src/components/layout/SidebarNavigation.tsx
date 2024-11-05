@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Folder, Archive, Play, User, CheckSquare, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface SidebarNavigationProps {
   collapsed: boolean;
@@ -18,21 +17,16 @@ export const SidebarNavigation = ({ collapsed }: SidebarNavigationProps) => {
   ];
 
   return (
-    <nav className="space-y-1 px-3">
+    <nav className="flex-1 p-4 space-y-2">
       {links.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
           to={to}
           className={({ isActive }) =>
-            cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-              isActive 
-                ? "bg-secondary text-secondary-foreground" 
-                : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
-            )
+            `sidebar-link ${isActive ? "active" : ""}`
           }
         >
-          <Icon className="h-4 w-4" />
+          <Icon className="h-5 w-5" />
           {!collapsed && <span>{label}</span>}
         </NavLink>
       ))}
