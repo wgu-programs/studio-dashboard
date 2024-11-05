@@ -44,12 +44,29 @@ export const PageTable = ({ pages }: PageTableProps) => {
 
       if (error) throw error;
 
-      return {
+      const counts = {
         completed: data.filter(page => page.status === 'completed').length,
         queued: data.filter(page => page.status === 'queued').length,
         failed: data.filter(page => page.status === 'failed').length,
         total: data.length
       };
+
+      // If all pages are completed, update the run status
+      if (counts.completed === counts.total && counts.total > 0) {
+        const { error: updateError } = await supabase
+          .from('runs')
+          .update({ 
+            status: 'completed',
+            completed_at: new Date().toISOString()
+          })
+          .eq('run_id', runId);
+
+        if (updateError) {
+          console.error('Error updating run status:', updateError);
+        }
+      }
+
+      return counts;
     },
     enabled: !!runId,
   });
