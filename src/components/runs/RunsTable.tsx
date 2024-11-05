@@ -9,8 +9,11 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { RefreshCw } from 'lucide-react';
 
 interface RunsTableProps {
 	runs: any[];
@@ -26,9 +29,10 @@ const statusOrder = {
 
 export const RunsTable = ({ runs }: RunsTableProps) => {
 	const navigate = useNavigate();
+	const { toast } = useToast();
 
 	// Fetch page counts for all runs
-	const { data: pageCounts } = useQuery({
+	const { data: pageCounts, refetch: refetchPageCounts } = useQuery({
 		queryKey: ['runPageCounts'],
 		queryFn: async () => {
 			const { data, error } = await supabase
@@ -38,7 +42,6 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 
 			if (error) throw error;
 
-			// Create an object with run_id as key and counts as value
 			const counts: Record<string, { completed: number; queued: number; failed: number; total: number }> = {};
 			for (const run of runs) {
 				const runPages = data?.filter(d => d.run_id === run.run_id) || [];
@@ -53,6 +56,42 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 		},
 		enabled: runs.length > 0,
 	});
+
+	const handleRequeueFailed = async (runId: string, e: React.MouseEvent) => {
+		e.stopPropagation();
+		try {
+			// Update failed pages to queued
+			const { error: updateError } = await supabase
+				.from('pages')
+				.update({ status: 'queued' })
+				.eq('run_id', runId)
+				.eq('status', 'failed');
+
+			if (updateError) throw updateError;
+
+			// Update run status to processing
+			const { error: runError } = await supabase
+				.from('runs')
+				.update({ status: 'processing' })
+				.eq('run_id', runId);
+
+			if (runError) throw runError;
+
+			toast({
+				title: "Success",
+				description: "Failed pages have been requeued",
+			});
+
+			refetchPageCounts();
+		} catch (error: any) {
+			console.error('Error requeuing failed pages:', error);
+			toast({
+				title: "Error",
+				description: error.message || "Failed to requeue pages",
+				variant: "destructive",
+			});
+		}
+	};
 
 	// Group runs by status
 	const groupedRuns = runs.reduce((acc, run) => {
@@ -106,6 +145,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 								<TableHead>Completed</TableHead>
 								<TableHead>Pages</TableHead>
 								<TableHead>Status</TableHead>
+								<TableHead>Actions</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -159,6 +199,19 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 											/>
 											<span className='capitalize'>{run.status}</span>
 										</div>
+									</TableCell>
+									<TableCell>
+										{pageCounts?.[run.run_id]?.failed > 0 && (
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={(e) => handleRequeueFailed(run.run_id, e)}
+												className="flex items-center gap-2"
+											>
+												<RefreshCw className="h-4 w-4" />
+												Retry Failed
+											</Button>
+										)}
 									</TableCell>
 								</TableRow>
 							))}
