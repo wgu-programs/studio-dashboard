@@ -1,17 +1,20 @@
 import { NavLink } from "react-router-dom";
-import { Sun, Moon, LogOut } from "lucide-react";
-import { useTheme } from "../../components/theme/theme-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarControls } from "./SidebarControls";
 
 interface SidebarFooterProps {
   collapsed: boolean;
   profile: any;
   onSignOut: () => void;
+  setCollapsed: (collapsed: boolean) => void;
 }
 
-export const SidebarFooter = ({ collapsed, profile, onSignOut }: SidebarFooterProps) => {
-  const { theme, setTheme } = useTheme();
-
+export const SidebarFooter = ({ 
+  collapsed, 
+  profile, 
+  onSignOut,
+  setCollapsed 
+}: SidebarFooterProps) => {
   const getInitials = () => {
     if (!profile) return "";
     const firstInitial = profile.first_name?.[0] || "";
@@ -20,31 +23,14 @@ export const SidebarFooter = ({ collapsed, profile, onSignOut }: SidebarFooterPr
   };
 
   return (
-    <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-      <button
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
-      >
-        {theme === "light" ? (
-          <>
-            <Moon className="h-5 w-5" />
-            {!collapsed && <span>Dark mode</span>}
-          </>
-        ) : (
-          <>
-            <Sun className="h-5 w-5" />
-            {!collapsed && <span>Light mode</span>}
-          </>
-        )}
-      </button>
-
+    <div className="mt-auto">
       <NavLink
         to="/profile"
         className={({ isActive }) =>
           `w-full flex items-center gap-3 px-4 py-2 text-sm ${
             isActive
-              ? "bg-gray-100 dark:bg-sidebar-hover text-gray-900 dark:text-white"
-              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-sidebar-hover"
+              ? "bg-gray-100 dark:bg-gray-800/50 text-gray-900 dark:text-gray-300"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50"
           } rounded-lg transition-colors`
         }
       >
@@ -58,14 +44,11 @@ export const SidebarFooter = ({ collapsed, profile, onSignOut }: SidebarFooterPr
           </span>
         )}
       </NavLink>
-
-      <button
-        onClick={onSignOut}
-        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-gray-100 dark:hover:bg-sidebar-hover rounded-lg transition-colors"
-      >
-        <LogOut className="h-5 w-5" />
-        {!collapsed && <span>Sign out</span>}
-      </button>
+      <SidebarControls 
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        onSignOut={onSignOut}
+      />
     </div>
   );
 };

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
-import { useTheme } from "../theme/theme-provider";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarNavigation } from "./SidebarNavigation";
 import { SidebarFooter } from "./SidebarFooter";
@@ -13,7 +12,6 @@ const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -99,7 +97,7 @@ const Sidebar = () => {
         collapsed ? "w-20" : "w-64"
       }`}
     >
-      <SidebarHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+      <SidebarHeader collapsed={collapsed} />
       {session && profile && (
         <>
           <SidebarNavigation collapsed={collapsed} />
@@ -107,6 +105,7 @@ const Sidebar = () => {
             collapsed={collapsed}
             profile={profile}
             onSignOut={handleSignOut}
+            setCollapsed={setCollapsed}
           />
         </>
       )}
