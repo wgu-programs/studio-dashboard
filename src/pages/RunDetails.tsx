@@ -6,9 +6,12 @@ import { CrawlerInfoCard } from "@/components/runs/CrawlerInfoCard";
 import { PagesSection } from "@/components/runs/PagesSection";
 import { RunControls } from "@/components/runs/RunControls";
 import { useOutletContext } from "react-router-dom";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const RunDetails = () => {
   const { runId } = useParams();
+  const queryClient = useQueryClient();
   const { PageTitle } = useOutletContext<{
     PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
   }>();
@@ -76,6 +79,50 @@ const RunDetails = () => {
     },
     enabled: !!runId,
   });
+
+  useEffect(() => {
+    if (!runId) return;
+
+    // Subscribe to changes in the run
+    const runSubscription = supabase
+      .channel('run-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'runs',
+          filter: `run_id=eq.${runId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['run', runId] });
+        }
+      )
+      .subscribe();
+
+    // Subscribe to changes in pages
+    const pagesSubscription = supabase
+      .channel('pages-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pages',
+          filter: `run_id=eq.${runId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['run-pages', runId] });
+          queryClient.invalidateQueries({ queryKey: ['run-page-counts', runId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      runSubscription.unsubscribe();
+      pagesSubscription.unsubscribe();
+    };
+  }, [runId, queryClient]);
 
   if (!run) {
     return <div>Loading...</div>;
