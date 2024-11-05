@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { PauseIcon, SquareX, PlayIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 interface RunControlsProps {
   runId: string;
@@ -9,8 +8,6 @@ interface RunControlsProps {
 }
 
 export const RunControls = ({ runId, status }: RunControlsProps) => {
-  const { toast } = useToast();
-
   const updateRunStatus = async (newStatus: string) => {
     try {
       const { error } = await supabase
@@ -19,17 +16,8 @@ export const RunControls = ({ runId, status }: RunControlsProps) => {
         .eq("run_id", runId);
 
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `Run ${newStatus} successfully`,
-      });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: `Failed to ${newStatus} run`,
-        variant: "destructive",
-      });
+      console.error(`Failed to ${newStatus} run`, error);
     }
   };
 
