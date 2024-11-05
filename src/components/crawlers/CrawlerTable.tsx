@@ -89,17 +89,8 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                 <TableCell>{crawler.description || "No description"}</TableCell>
                 <TableCell>
                   <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      {latestRun ? (
-                        <>
-                          <div>Status: {latestRun.status}</div>
-                          <div className="text-sm text-muted-foreground">
-                            Started: {formatDistanceToNow(new Date(latestRun.started_at), { addSuffix: true })}
-                          </div>
-                        </>
-                      ) : (
-                        "No runs"
-                      )}
+                    <div>
+                      {latestRun ? "Has previous runs" : "No runs"}
                     </div>
                     <Button
                       variant="outline"
