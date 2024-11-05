@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,35 +11,50 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  );
-
   try {
-    console.log('Starting to process queued runs...');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
 
-    // Get all queued runs that aren't cancelled
+    // Find runs that are queued
     const { data: queuedRuns, error: runsError } = await supabase
       .from('runs')
-      .select('run_id')
-      .eq('status', 'queued');
+      .select('*')
+      .in('status', ['queued', 'processing'])
+      .order('started_at', { ascending: true });
 
-    if (runsError) throw runsError;
+    if (runsError) {
+      throw runsError;
+    }
 
-    console.log(`Found ${queuedRuns?.length || 0} queued runs`);
+    console.log(`Found ${queuedRuns?.length || 0} queued/processing runs`);
 
+    // Process each run
     for (const run of queuedRuns || []) {
-      // Get unprocessed pages for this run
+      console.log(`Processing run ${run.run_id}`);
+
+      // Update run status to processing if it was queued
+      if (run.status === 'queued') {
+        await supabase
+          .from('runs')
+          .update({ status: 'processing' })
+          .eq('run_id', run.run_id);
+      }
+
+      // Get all pages for this run
       const { data: pages, error: pagesError } = await supabase
         .from('pages')
-        .select('page_id, url')
+        .select('*')
         .eq('run_id', run.run_id)
-        .eq('status', 'queued');
+        .is('status', null);
 
-      if (pagesError) throw pagesError;
+      if (pagesError) {
+        console.error(`Error fetching pages for run ${run.run_id}:`, pagesError);
+        continue;
+      }
 
-      console.log(`Processing ${pages?.length || 0} pages for run ${run.run_id}`);
+      console.log(`Found ${pages?.length || 0} unprocessed pages for run ${run.run_id}`);
 
       // Process each page
       for (const page of pages || []) {
@@ -64,7 +79,7 @@ Deno.serve(async (req) => {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
             },
-            body: JSON.stringify({ record: page }),
+            body: JSON.stringify({ pageId: page.page_id }),
           }
         );
 
@@ -77,32 +92,33 @@ Deno.serve(async (req) => {
       }
 
       // If all pages are processed, update run status
-      if (pages?.length === 0) {
-        const { error: updateError } = await supabase
-          .from('runs')
-          .update({ status: 'completed', completed_at: new Date().toISOString() })
-          .eq('run_id', run.run_id);
+      const { data: remainingPages } = await supabase
+        .from('pages')
+        .select('page_id')
+        .eq('run_id', run.run_id)
+        .is('status', null);
 
-        if (updateError) {
-          console.error(`Failed to update run status: ${updateError.message}`);
-        }
+      if (!remainingPages?.length) {
+        await supabase
+          .from('runs')
+          .update({ 
+            status: 'completed',
+            completed_at: new Date().toISOString()
+          })
+          .eq('run_id', run.run_id);
+        console.log(`Run ${run.run_id} completed`);
       }
     }
 
-    return new Response(
-      JSON.stringify({ message: 'Successfully processed queued runs' }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
   } catch (error) {
     console.error('Error processing queued runs:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
