@@ -102,9 +102,7 @@ const Sidebar = () => {
       {session && profile && (
         <>
           <SidebarNavigation collapsed={collapsed} />
-          <div className="border-t border-gray-200 dark:border-gray-800">
-            <WorkspaceList collapsed={collapsed} />
-          </div>
+          <WorkspaceList collapsed={collapsed} />
           <div className="flex-1" />
           <SidebarFooter
             collapsed={collapsed}
