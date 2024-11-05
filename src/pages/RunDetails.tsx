@@ -84,6 +84,29 @@ const RunDetails = () => {
   useEffect(() => {
     if (runId) {
       fetchRun();
+
+      // Set up real-time subscription for run status updates
+      const subscription = supabase
+        .channel(`run-${runId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'runs',
+            filter: `run_id=eq.${runId}`
+          },
+          (payload) => {
+            if (payload.new) {
+              setRun(current => current ? { ...current, ...payload.new } : null);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
     }
   }, [runId]);
 
