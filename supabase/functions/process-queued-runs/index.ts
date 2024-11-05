@@ -43,6 +43,18 @@ Deno.serve(async (req) => {
 
       // Process each page
       for (const page of pages || []) {
+        // Skip processing if the run status has changed
+        const { data: currentRun } = await supabase
+          .from('runs')
+          .select('status')
+          .eq('run_id', run.run_id)
+          .single();
+
+        if (currentRun?.status === 'paused' || currentRun?.status === 'cancelled') {
+          console.log(`Run ${run.run_id} was ${currentRun.status}, skipping remaining pages`);
+          break;
+        }
+
         // Trigger the crawl-page function for each page
         const response = await fetch(
           `${Deno.env.get('SUPABASE_URL')}/functions/v1/crawl-page`,
@@ -59,6 +71,9 @@ Deno.serve(async (req) => {
         if (!response.ok) {
           console.error(`Failed to process page ${page.page_id}: ${await response.text()}`);
         }
+
+        // Add a small delay between requests to avoid overwhelming the system
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       // If all pages are processed, update run status
