@@ -8,6 +8,7 @@ import { SidebarNavigation } from "./SidebarNavigation";
 import { SidebarFooter } from "./SidebarFooter";
 import { WorkspaceList } from "../workspace/WorkspaceList";
 import { type Profile } from "@/integrations/supabase/types/profiles";
+import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -94,16 +95,18 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
-        collapsed ? "w-20" : "w-64"
-      }`}
+      className={cn(
+        "flex h-screen flex-col bg-background transition-all duration-300",
+        collapsed ? "w-[70px]" : "w-[240px]"
+      )}
     >
       <SidebarHeader collapsed={collapsed} />
       {session && profile && (
         <>
-          <SidebarNavigation collapsed={collapsed} />
-          <WorkspaceList collapsed={collapsed} />
-          <div className="flex-1" />
+          <div className="flex-1 overflow-auto">
+            <SidebarNavigation collapsed={collapsed} />
+            <WorkspaceList collapsed={collapsed} />
+          </div>
           <SidebarFooter
             collapsed={collapsed}
             profile={profile}
