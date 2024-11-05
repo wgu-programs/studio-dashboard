@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Find runs that are queued
+    // Find runs that are queued or processing
     const { data: queuedRuns, error: runsError } = await supabase
       .from('runs')
       .select('*')
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
           .eq('run_id', run.run_id);
       }
 
-      // Get all pages for this run
+      // Get all unprocessed pages for this run
       const { data: pages, error: pagesError } = await supabase
         .from('pages')
         .select('*')
@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // If all pages are processed, update run status
+      // Check if all pages are processed and update run status accordingly
       const { data: remainingPages } = await supabase
         .from('pages')
         .select('page_id')
