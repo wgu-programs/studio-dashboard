@@ -76,6 +76,9 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 								<TableHead>Started</TableHead>
 								<TableHead>Completed</TableHead>
 								<TableHead>Status</TableHead>
+								<TableHead className="text-right">Queued Pages</TableHead>
+								<TableHead className="text-right">Completed Pages</TableHead>
+								<TableHead className="text-right">Total Pages</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -121,6 +124,15 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 											/>
 											<span className='capitalize'>{run.status}</span>
 										</div>
+									</TableCell>
+									<TableCell className="text-right">
+										{run.pages?.filter(p => p.status === 'queued').length || 0}
+									</TableCell>
+									<TableCell className="text-right">
+										{run.pages?.filter(p => p.status === 'completed').length || 0}
+									</TableCell>
+									<TableCell className="text-right">
+										{run.pages?.length || 0}
 									</TableCell>
 								</TableRow>
 							))}

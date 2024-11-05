@@ -18,7 +18,12 @@ const Runs = () => {
         .select(`
           *,
           crawler (
+            crawler_id,
             name
+          ),
+          pages (
+            page_id,
+            status
           )
         `)
         .order("started_at", { ascending: false })
