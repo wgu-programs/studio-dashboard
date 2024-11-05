@@ -132,7 +132,11 @@ const CrawlerDetails = () => {
   };
 
   useEffect(() => {
-    fetchCrawler();
+    if (crawlerId) {
+      fetchCrawler();
+    } else {
+      navigate("/crawlers");
+    }
   }, [crawlerId]);
 
   if (isLoading) {
