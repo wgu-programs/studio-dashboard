@@ -145,7 +145,9 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 									<TableCell className="space-y-1">
 										<div>Complete: {pageCounts?.[run.run_id]?.completed || 0}</div>
 										<div>Queued: {pageCounts?.[run.run_id]?.queued || 0}</div>
-										<div>Failed: {pageCounts?.[run.run_id]?.failed || 0}</div>
+										{(pageCounts?.[run.run_id]?.failed || 0) > 0 && (
+											<div className="text-red-500">Failed: {pageCounts?.[run.run_id]?.failed}</div>
+										)}
 										<div>Total: {pageCounts?.[run.run_id]?.total || 0}</div>
 									</TableCell>
 									<TableCell>
