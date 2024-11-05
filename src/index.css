@@ -62,9 +62,9 @@
 }
 
 .sidebar-link {
-  @apply flex items-center gap-3 px-4 py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-sidebar-hover rounded-lg transition-colors;
+  @apply flex items-center gap-3 px-4 py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-800/50 rounded-lg transition-colors;
 }
 
 .sidebar-link.active {
-  @apply bg-gray-100 text-gray-900 dark:bg-sidebar-hover dark:text-white;
+  @apply bg-gray-100 text-gray-900 dark:bg-gray-800/50 dark:text-gray-300;
 }
