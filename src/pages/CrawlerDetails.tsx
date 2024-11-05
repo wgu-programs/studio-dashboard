@@ -9,7 +9,7 @@ import { CrawlerRunsTable } from "@/components/crawlers/CrawlerRunsTable";
 import { Crawler } from "@/integrations/supabase/types/crawler";
 
 const CrawlerDetails = () => {
-  const { crawlerId } = useParams();
+  const { crawlerId } = useParams<{ crawlerId: string }>();
   const navigate = useNavigate();
   const [crawler, setCrawler] = useState<Crawler | null>(null);
   const [runs, setRuns] = useState<any[]>([]);
