@@ -54,46 +54,67 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
     }
   };
 
+  // Group crawlers by project
+  const groupedCrawlers = crawlers.reduce((acc, crawler) => {
+    const projectId = crawler.project?.project_id || 'no-project';
+    if (!acc[projectId]) {
+      acc[projectId] = {
+        projectName: crawler.project?.name || 'No Project',
+        crawlers: []
+      };
+    }
+    acc[projectId].crawlers.push(crawler);
+    return acc;
+  }, {} as Record<string, { projectName: string; crawlers: any[] }>);
+
   return (
     <div className="border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Project</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {crawlers.map((crawler) => (
-            <TableRow 
-              key={crawler.crawler_id}
-              className="cursor-pointer"
-              onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
-            >
-              <TableCell className="font-medium">
-                {crawler.name || "Unnamed Crawler"}
-              </TableCell>
-              <TableCell>
-                {crawler.project?.name || "No project"}
-              </TableCell>
-              <TableCell>{crawler.description || "No description"}</TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => handleStartCrawler(crawler, e)}
+          {Object.entries(groupedCrawlers).map(([projectId, { projectName, crawlers: projectCrawlers }]) => (
+            <React.Fragment key={projectId}>
+              <TableRow>
+                <TableCell 
+                  colSpan={3} 
+                  className="bg-muted/50 font-semibold"
                 >
-                  <PlayIcon className="h-4 w-4 mr-2" />
-                  Start Run
-                </Button>
-              </TableCell>
-            </TableRow>
+                  {projectName}
+                </TableCell>
+              </TableRow>
+              {projectCrawlers.map((crawler) => (
+                <TableRow 
+                  key={crawler.crawler_id}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
+                >
+                  <TableCell className="font-medium pl-8">
+                    {crawler.name || "Unnamed Crawler"}
+                  </TableCell>
+                  <TableCell>{crawler.description || "No description"}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleStartCrawler(crawler, e)}
+                    >
+                      <PlayIcon className="h-4 w-4 mr-2" />
+                      Start Run
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </React.Fragment>
           ))}
           {crawlers.length === 0 && (
             <TableRow>
-              <TableCell colSpan={4} className="text-center text-muted-foreground">
+              <TableCell colSpan={3} className="text-center text-muted-foreground">
                 No crawlers found
               </TableCell>
             </TableRow>
