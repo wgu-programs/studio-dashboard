@@ -33,15 +33,19 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 		queryFn: async () => {
 			const { data, error } = await supabase
 				.from('pages')
-				.select('run_id, count', { count: 'exact' })
+				.select('run_id, count', { count: 'exact', head: false })
 				.in('run_id', runs.map(run => run.run_id))
 				.groupBy('run_id');
 
 			if (error) throw error;
-			return data.reduce((acc: Record<string, number>, curr) => {
-				acc[curr.run_id] = parseInt(curr.count);
-				return acc;
-			}, {});
+			
+			// Create an object with run_id as key and count as value
+			const counts: Record<string, number> = {};
+			for (const run of runs) {
+				const pageCount = data?.find(d => d.run_id === run.run_id);
+				counts[run.run_id] = pageCount ? parseInt(pageCount.count) : 0;
+			}
+			return counts;
 		},
 		enabled: runs.length > 0,
 	});
