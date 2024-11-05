@@ -73,7 +73,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[400px]">Name</TableHead>
+            <TableHead className="w-[200px]">Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -95,7 +95,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                   className="cursor-pointer"
                   onClick={() => navigate(`/crawlers/${crawler.crawler_id}`)}
                 >
-                  <TableCell className="font-medium pl-8 w-[400px]">
+                  <TableCell className="font-medium pl-8 w-[200px]">
                     {crawler.name || "Unnamed Crawler"}
                   </TableCell>
                   <TableCell>{crawler.description || "No description"}</TableCell>
