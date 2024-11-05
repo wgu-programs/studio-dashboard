@@ -30,25 +30,29 @@ export const SidebarControls = ({
           )}
         </ToggleGroupItem>
 
-        <ToggleGroupItem
-          value="theme"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          className="data-[state=on]:bg-transparent"
-        >
-          {theme === "light" ? (
-            <Moon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" />
-          )}
-        </ToggleGroupItem>
+        {!collapsed && (
+          <>
+            <ToggleGroupItem
+              value="theme"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              className="data-[state=on]:bg-transparent"
+            >
+              {theme === "light" ? (
+                <Moon className="h-5 w-5" />
+              ) : (
+                <Sun className="h-5 w-5" />
+              )}
+            </ToggleGroupItem>
 
-        <ToggleGroupItem
-          value="signout"
-          onClick={onSignOut}
-          className="data-[state=on]:bg-transparent text-red-500 hover:text-red-700"
-        >
-          <LogOut className="h-5 w-5" />
-        </ToggleGroupItem>
+            <ToggleGroupItem
+              value="signout"
+              onClick={onSignOut}
+              className="data-[state=on]:bg-transparent text-red-500 hover:text-red-700"
+            >
+              <LogOut className="h-5 w-5" />
+            </ToggleGroupItem>
+          </>
+        )}
       </ToggleGroup>
     </div>
   );
