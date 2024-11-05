@@ -27,21 +27,69 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
   const handleStartCrawler = async (crawler: any, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
+      // First get the crawler details to get project_id and workspace_id
+      const { data: crawlerData, error: crawlerError } = await supabase
+        .from("crawler")
+        .select(`
+          project_id,
+          workspace_id,
+          start_urls,
+          projects (
+            workspace_id
+          )
+        `)
+        .eq("crawler_id", crawler.crawler_id)
+        .single();
+
+      if (crawlerError) throw crawlerError;
+
+      // Get the workspace_id either directly from crawler or from its project
+      const workspace_id = crawlerData.workspace_id || crawlerData.projects?.workspace_id;
+
       const now = new Date();
       const utcTimestamp = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString();
-      
-      const { error } = await supabase
+
+      // Create the run
+      const { data: runData, error: runError } = await supabase
         .from("runs")
         .insert([
           {
             crawler_id: crawler.crawler_id,
+            project_id: crawlerData.project_id,
+            workspace_id: workspace_id,
             status: "queued",
             started_at: utcTimestamp,
             name: generateRunName(),
           },
-        ]);
+        ])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (runError) throw runError;
+
+      // Then add all start URLs as pages
+      if (Array.isArray(crawlerData.start_urls) && crawlerData.start_urls.length > 0) {
+        const pages = crawlerData.start_urls.map((url: string) => ({
+          url,
+          crawler_id: crawler.crawler_id,
+          run_id: runData.run_id,
+          project_id: crawlerData.project_id,
+          workspace_id: workspace_id,
+          status: "queued",
+        }));
+
+        const { error: pagesError } = await supabase
+          .from("pages")
+          .insert(pages);
+
+        if (pagesError) throw pagesError;
+      } else {
+        toast({
+          title: "Notice",
+          description: "No start URLs configured for this crawler",
+          variant: "default",
+        });
+      }
 
       toast({
         title: "Success",
@@ -49,10 +97,11 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
       });
 
       onRunStatusChange();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error starting crawler:', error);
       toast({
         title: "Error",
-        description: "Failed to start crawler",
+        description: error.message || "Failed to start crawler",
         variant: "destructive",
       });
     }
