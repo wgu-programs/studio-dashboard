@@ -39,12 +39,14 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 			if (error) throw error;
 
 			// Create an object with run_id as key and counts as value
-			const counts: Record<string, { total: number; queued: number }> = {};
+			const counts: Record<string, { completed: number; queued: number; failed: number; total: number }> = {};
 			for (const run of runs) {
 				const runPages = data?.filter(d => d.run_id === run.run_id) || [];
 				counts[run.run_id] = {
-					total: runPages.length,
-					queued: runPages.filter(page => page.status === 'queued').length
+					completed: runPages.filter(page => page.status === 'completed').length,
+					queued: runPages.filter(page => page.status === 'queued').length,
+					failed: runPages.filter(page => page.status === 'failed').length,
+					total: runPages.length
 				};
 			}
 			return counts;
@@ -102,7 +104,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 								<TableHead>Crawler</TableHead>
 								<TableHead>Started</TableHead>
 								<TableHead>Completed</TableHead>
-								<TableHead>Pages (Queued/Total)</TableHead>
+								<TableHead>Pages</TableHead>
 								<TableHead>Status</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -140,8 +142,11 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 											  })
 											: 'Not completed'}
 									</TableCell>
-									<TableCell>
-										{pageCounts?.[run.run_id]?.queued || 0}/{pageCounts?.[run.run_id]?.total || 0}
+									<TableCell className="space-y-1">
+										<div>Complete: {pageCounts?.[run.run_id]?.completed || 0}</div>
+										<div>Queued: {pageCounts?.[run.run_id]?.queued || 0}</div>
+										<div>Failed: {pageCounts?.[run.run_id]?.failed || 0}</div>
+										<div>Total: {pageCounts?.[run.run_id]?.total || 0}</div>
 									</TableCell>
 									<TableCell>
 										<div className='flex items-center gap-2'>
