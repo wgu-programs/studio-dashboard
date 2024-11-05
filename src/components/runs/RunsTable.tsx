@@ -9,6 +9,8 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RunsTableProps {
 	runs: any[];
@@ -24,6 +26,25 @@ const statusOrder = {
 
 export const RunsTable = ({ runs }: RunsTableProps) => {
 	const navigate = useNavigate();
+
+	// Fetch page counts for all runs
+	const { data: pageCounts } = useQuery({
+		queryKey: ['runPageCounts'],
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from('pages')
+				.select('run_id, count', { count: 'exact' })
+				.in('run_id', runs.map(run => run.run_id))
+				.groupBy('run_id');
+
+			if (error) throw error;
+			return data.reduce((acc: Record<string, number>, curr) => {
+				acc[curr.run_id] = parseInt(curr.count);
+				return acc;
+			}, {});
+		},
+		enabled: runs.length > 0,
+	});
 
 	// Group runs by status
 	const groupedRuns = runs.reduce((acc, run) => {
@@ -75,6 +96,7 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 								<TableHead>Crawler</TableHead>
 								<TableHead>Started</TableHead>
 								<TableHead>Completed</TableHead>
+								<TableHead>Pages</TableHead>
 								<TableHead>Status</TableHead>
 							</TableRow>
 						</TableHeader>
@@ -111,6 +133,9 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 													addSuffix: true,
 											  })
 											: 'Not completed'}
+									</TableCell>
+									<TableCell>
+										{pageCounts?.[run.run_id] || 0}
 									</TableCell>
 									<TableCell>
 										<div className='flex items-center gap-2'>

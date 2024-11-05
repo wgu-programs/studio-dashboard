@@ -198,6 +198,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_pages_run"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "runs"
+            referencedColumns: ["run_id"]
+          },
+          {
             foreignKeyName: "pages_crawler_id_fkey"
             columns: ["crawler_id"]
             isOneToOne: false
