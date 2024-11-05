@@ -24,7 +24,8 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleStartCrawler = async (crawler: any) => {
+  const handleStartCrawler = async (crawler: any, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       const { error } = await supabase
         .from("runs")
@@ -62,9 +63,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
             <TableHead>Name</TableHead>
             <TableHead>Project</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Latest Run</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Runs</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -88,35 +87,36 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
                   {crawler.project?.name || "No project"}
                 </TableCell>
                 <TableCell>{crawler.description || "No description"}</TableCell>
-                <TableCell>{crawler.status}</TableCell>
                 <TableCell>
-                  {latestRun ? (
+                  <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <div>Status: {latestRun.status}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Started: {formatDistanceToNow(new Date(latestRun.started_at), { addSuffix: true })}
-                      </div>
+                      {latestRun ? (
+                        <>
+                          <div>Status: {latestRun.status}</div>
+                          <div className="text-sm text-muted-foreground">
+                            Started: {formatDistanceToNow(new Date(latestRun.started_at), { addSuffix: true })}
+                          </div>
+                        </>
+                      ) : (
+                        "No runs"
+                      )}
                     </div>
-                  ) : (
-                    "No runs"
-                  )}
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStartCrawler(crawler)}
-                  >
-                    <PlayIcon className="h-4 w-4 mr-2" />
-                    Start Run
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleStartCrawler(crawler, e)}
+                    >
+                      <PlayIcon className="h-4 w-4 mr-2" />
+                      Start Run
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             );
           })}
           {crawlers.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
+              <TableCell colSpan={4} className="text-center text-muted-foreground">
                 No crawlers found
               </TableCell>
             </TableRow>
