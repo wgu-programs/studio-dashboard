@@ -88,11 +88,11 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 										{run.name || 'Unnamed Run'}
 									</TableCell>
 									<TableCell onClick={(e) => e.stopPropagation()}>
-										{ JSON.stringify(run.crawler) ? (
+										{run.crawler ? (
 											<Link
 												to={`/crawlers/${run.crawler.crawler_id}`}
 												className='text-primary hover:underline'>
-												{run.crawler || 'Unnamed Crawler'}
+												{JSON.stringify(run.crawler) || 'Unnamed Crawler'}
 											</Link>
 										) : (
 											'No crawler'
