@@ -6,7 +6,9 @@ import { withAuth } from "../auth/withAuth";
 const Layout = () => {
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      <div className="bg-sidebar-background dark:bg-sidebar-background-dark">
+        <Sidebar />
+      </div>
       <main className="flex-1 overflow-auto">
         <div className="p-8">
           <div className="space-y-6">
