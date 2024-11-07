@@ -14,8 +14,28 @@ import { Button } from "@/components/ui/button";
 import { Play as PlayIcon } from "lucide-react";
 import { generateRunName } from "@/utils/nameGenerator";
 
+interface Project {
+  name: string;
+  project_id: string;
+}
+
+interface Crawler {
+  crawler_id: string;
+  name: string | null;
+  description: string | null;
+  project?: Project;
+  start_urls?: any;
+}
+
+interface GroupedCrawlers {
+  [key: string]: {
+    projectName: string;
+    crawlers: Crawler[];
+  };
+}
+
 interface CrawlerTableProps {
-  crawlers: any[];
+  crawlers: Crawler[];
   showArchived: boolean;
   onRunStatusChange: () => void;
 }
@@ -24,7 +44,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleStartCrawler = async (crawler: any, e: React.MouseEvent) => {
+  const handleStartCrawler = async (crawler: Crawler, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       // First get the crawler details to get project_id and workspace_id
@@ -108,7 +128,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
   };
 
   // Group crawlers by project
-  const groupedCrawlers = crawlers.reduce((acc, crawler) => {
+  const groupedCrawlers: GroupedCrawlers = crawlers.reduce((acc, crawler) => {
     const projectId = crawler.project?.project_id || 'no-project';
     if (!acc[projectId]) {
       acc[projectId] = {
@@ -118,7 +138,7 @@ export const CrawlerTable = ({ crawlers, showArchived, onRunStatusChange }: Craw
     }
     acc[projectId].crawlers.push(crawler);
     return acc;
-  }, {} as Record<string, { projectName: string; crawlers: any[] }>);
+  }, {} as GroupedCrawlers);
 
   return (
     <div className="border rounded-lg">

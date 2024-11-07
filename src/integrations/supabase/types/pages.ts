@@ -7,7 +7,7 @@ export interface Page {
   url: string;
   title: string | null;
   html: string | null;
-  snapshot_url: string | null;
+  screenshot_url: string | null;  // Changed from snapshot_url
   speakable_content: string[] | null;
   main_entity: string | null;
   keywords: string[] | null;
@@ -28,7 +28,7 @@ export interface PageInsert {
   run_id?: string | null;
   title?: string | null;
   html?: string | null;
-  snapshot_url?: string | null;
+  screenshot_url?: string | null;  // Changed from snapshot_url
   speakable_content?: string[] | null;
   main_entity?: string | null;
   keywords?: string[] | null;

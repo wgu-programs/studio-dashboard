@@ -8,65 +8,62 @@ import { formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 
 const PageDetails = () => {
-	const { pageId } = useParams();
-	const [page, setPage] = useState<Page | null>(null);
-	const { toast } = useToast();
-	const { PageTitle } = useOutletContext<{
-		PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
-	}>();
+  const { pageId } = useParams();
+  const [page, setPage] = useState<Page | null>(null);
+  const { toast } = useToast();
+  const { PageTitle } = useOutletContext<{
+    PageTitle: ({ children }: { children: React.ReactNode }) => JSX.Element;
+  }>();
 
-	const fetchPage = async () => {
-		try {
-			const { data, error } = await supabase
-				.from('pages')
-				.select('*')
-				.eq('page_id', pageId)
-				.single();
+  const fetchPage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('page_id', pageId)
+        .single();
 
-			if (error) throw error;
-			setPage({
-				...data,
-				workspace_id: data.workspace_id?.toString(),
-			});
-		} catch (error) {
-			toast({
-				title: 'Error',
-				description: 'Failed to fetch page details',
-				variant: 'destructive',
-			});
-		}
-	};
+      if (error) throw error;
+      setPage(data as Page);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch page details',
+        variant: 'destructive',
+      });
+    }
+  };
 
-	useEffect(() => {
-		if (pageId) {
-			fetchPage();
-		}
-	}, [pageId]);
+  useEffect(() => {
+    if (pageId) {
+      fetchPage();
+    }
+  }, [pageId]);
 
-	if (!page) {
-		return <div>Loading...</div>;
-	}
+  if (!page) {
+    return <div>Loading...</div>;
+  }
 
-	return (
-		<div className='space-y-6'>
-			<PageTitle>{page.title || 'Untitled Page'}</PageTitle>
+  return (
+    <div className='space-y-6'>
+      <PageTitle>{page.title || 'Untitled Page'}</PageTitle>
 
-			<Card className='overflow-hidden'>
-				{page.status === 'queued' ? (
-					<div className='w-full h-64 bg-muted flex items-center justify-center'>
-						<Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-					</div>
-				) : (
-					<img
-						src={
-							page.screenshot_url ||
-							'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
-						}
-						alt={page.title || 'Page snapshot'}
-						className='w-full h-auto'
-					/>
-				)}
-			</Card>
+      <Card className='overflow-hidden'>
+        {page.status === 'queued' ? (
+          <div className='w-full h-64 bg-muted flex items-center justify-center'>
+            <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+          </div>
+        ) : (
+          <img
+            src={
+              page.screenshot_url ||
+              'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
+            }
+            alt={page.title || 'Page snapshot'}
+            className='w-full h-auto'
+          />
+        )}
+      </Card>
 
 			<div className='grid gap-6 md:grid-cols-2'>
 				<Card>
@@ -171,8 +168,8 @@ const PageDetails = () => {
 					</Card>
 				)}
 			</div>
-		</div>
-	);
+    </div>
+  );
 };
 
 export default PageDetails;

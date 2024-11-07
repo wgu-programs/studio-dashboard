@@ -21,7 +21,7 @@ export const RunControls = ({ runId, status }: RunControlsProps) => {
     }
   };
 
-  if (status !== "running" && status !== "queued" && status !== "paused") {
+  if (!status || !["running", "queued", "paused"].includes(status)) {
     return null;
   }
 
@@ -41,7 +41,6 @@ export const RunControls = ({ runId, status }: RunControlsProps) => {
           variant="outline"
           size="sm"
           onClick={() => updateRunStatus("paused")}
-          disabled={status === "paused"}
         >
           <PauseIcon className="h-4 w-4" />
           <span className="ml-2">Pause</span>
