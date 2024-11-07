@@ -42,7 +42,8 @@ const handler = async (req: Request) => {
       'x-api-key': Deno.env.get('AWS_API_GATEWAY_KEY')!,
     },
 
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ "commands": [{ "action": "get", "params": [url] }, { "action": "manage().window().maximize", "params": [] }, { "action": "takeScreenshot", "params": [] }] }),
+
   });
 
 
