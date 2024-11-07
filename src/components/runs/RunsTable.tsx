@@ -136,87 +136,89 @@ export const RunsTable = ({ runs }: RunsTableProps) => {
 						{status}
 						<Badge variant='secondary'>{groupedRuns[status].length}</Badge>
 					</h3>
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Name</TableHead>
-								<TableHead>Crawler</TableHead>
-								<TableHead>Started</TableHead>
-								<TableHead>Completed</TableHead>
-								<TableHead>Pages</TableHead>
-								<TableHead>Status</TableHead>
-								<TableHead>Actions</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{groupedRuns[status].map((run) => (
-								<TableRow
-									key={run.run_id}
-									className='cursor-pointer hover:bg-muted/50'
-									onClick={() => navigate(`/runs/${run.run_id}`)}>
-									<TableCell className='font-medium'>
-										{run.name || 'Unnamed Run'}
-									</TableCell>
-									<TableCell onClick={(e) => e.stopPropagation()}>
-										{run.crawler ? (
-											<Link
-												to={`/crawlers/${run.crawler.crawler_id}`}
-												className='text-primary hover:underline'>
-												{run.crawler.name || 'Unnamed Crawler'}
-											</Link>
-										) : (
-											'No crawler'
-										)}
-									</TableCell>
-									<TableCell>
-										{run.started_at
-											? formatDistanceToNow(new Date(run.started_at), {
-													addSuffix: true,
-											  })
-											: 'Not started'}
-									</TableCell>
-									<TableCell>
-										{run.completed_at
-											? formatDistanceToNow(new Date(run.completed_at), {
-													addSuffix: true,
-											  })
-											: 'Not completed'}
-									</TableCell>
-									<TableCell className="space-y-1">
-										<div>Queued: {pageCounts?.[run.run_id]?.queued || 0}</div>
-										<div>Complete: {pageCounts?.[run.run_id]?.completed || 0}</div>
-										{(pageCounts?.[run.run_id]?.failed || 0) > 0 && (
-											<div className="text-red-500">Failed: {pageCounts?.[run.run_id]?.failed}</div>
-										)}
-										<div>Total: {pageCounts?.[run.run_id]?.total || 0}</div>
-									</TableCell>
-									<TableCell>
-										<div className='flex items-center gap-2'>
-											<div
-												className={`w-2 h-2 rounded-full ${getStatusColor(
-													run.status
-												)}`}
-											/>
-											<span className='capitalize'>{run.status}</span>
-										</div>
-									</TableCell>
-									<TableCell>
-										{pageCounts?.[run.run_id]?.failed > 0 && (
-											<Button
-												variant="outline"
-												size="sm"
-												onClick={(e) => handleRequeueFailed(run.run_id, e)}
-												className="flex items-center gap-2"
-											>
-												<RefreshCw className="h-4 w-4" />
-												Retry Failed
-											</Button>
-										)}
-									</TableCell>
+					<div className="border rounded-lg">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Name</TableHead>
+									<TableHead>Crawler</TableHead>
+									<TableHead>Started</TableHead>
+									<TableHead>Completed</TableHead>
+									<TableHead>Pages</TableHead>
+									<TableHead>Status</TableHead>
+									<TableHead>Actions</TableHead>
 								</TableRow>
-							))}
-						</TableBody>
-					</Table>
+							</TableHeader>
+							<TableBody>
+								{groupedRuns[status].map((run) => (
+									<TableRow
+										key={run.run_id}
+										className='cursor-pointer hover:bg-muted/50'
+										onClick={() => navigate(`/runs/${run.run_id}`)}>
+										<TableCell className='font-medium'>
+											{run.name || 'Unnamed Run'}
+										</TableCell>
+										<TableCell onClick={(e) => e.stopPropagation()}>
+											{run.crawler ? (
+												<Link
+													to={`/crawlers/${run.crawler.crawler_id}`}
+													className='text-primary hover:underline'>
+													{run.crawler.name || 'Unnamed Crawler'}
+												</Link>
+											) : (
+												'No crawler'
+											)}
+										</TableCell>
+										<TableCell>
+											{run.started_at
+												? formatDistanceToNow(new Date(run.started_at), {
+														addSuffix: true,
+												  })
+												: 'Not started'}
+										</TableCell>
+										<TableCell>
+											{run.completed_at
+												? formatDistanceToNow(new Date(run.completed_at), {
+														addSuffix: true,
+												  })
+												: 'Not completed'}
+										</TableCell>
+										<TableCell className="space-y-1">
+											<div>Queued: {pageCounts?.[run.run_id]?.queued || 0}</div>
+											<div>Complete: {pageCounts?.[run.run_id]?.completed || 0}</div>
+											{(pageCounts?.[run.run_id]?.failed || 0) > 0 && (
+												<div className="text-red-500">Failed: {pageCounts?.[run.run_id]?.failed}</div>
+											)}
+											<div>Total: {pageCounts?.[run.run_id]?.total || 0}</div>
+										</TableCell>
+										<TableCell>
+											<div className='flex items-center gap-2'>
+												<div
+													className={`w-2 h-2 rounded-full ${getStatusColor(
+														run.status
+													)}`}
+												/>
+												<span className='capitalize'>{run.status}</span>
+											</div>
+										</TableCell>
+										<TableCell>
+											{pageCounts?.[run.run_id]?.failed > 0 && (
+												<Button
+													variant="outline"
+													size="sm"
+													onClick={(e) => handleRequeueFailed(run.run_id, e)}
+													className="flex items-center gap-2"
+												>
+													<RefreshCw className="h-4 w-4" />
+													Retry Failed
+												</Button>
+											)}
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</div>
 				</div>
 			))}
 		</div>
