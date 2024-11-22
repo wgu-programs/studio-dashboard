@@ -6,10 +6,8 @@ import { withAuth } from "../auth/withAuth";
 const Layout = () => {
   return (
     <div className="flex h-screen bg-background">
-      <div className="bg-sidebar-background dark:bg-sidebar-background-dark">
-        <Sidebar />
-      </div>
-      <main className="flex-1 overflow-auto">
+      <Sidebar />
+      <main className="flex-1 overflow-auto w-full">
         <div className="p-8">
           <div className="space-y-6">
             <Outlet context={{ PageTitle: PageHeader }} />

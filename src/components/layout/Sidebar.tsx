@@ -8,9 +8,12 @@ import { SidebarNavigation } from "./SidebarNavigation";
 import { SidebarFooter } from "./SidebarFooter";
 import { WorkspaceList } from "../workspace/WorkspaceList";
 import { type Profile } from "@/integrations/supabase/types/profiles";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
@@ -92,27 +95,67 @@ const Sidebar = () => {
     navigate("/");
   };
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <div
-      className={`h-screen flex flex-col border-r border-gray-200 dark:border-gray-800 transition-all duration-300 ${
-        collapsed ? "w-20" : "w-64"
-      }`}
-    >
-      <SidebarHeader collapsed={collapsed} />
-      {session && profile && (
-        <>
-          <SidebarNavigation collapsed={collapsed} />
-          <WorkspaceList collapsed={collapsed} />
-          <div className="flex-1" />
-          <SidebarFooter
-            collapsed={collapsed}
-            profile={profile}
-            onSignOut={handleSignOut}
-            setCollapsed={setCollapsed}
-          />
-        </>
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-background border border-border"
+      >
+        {isOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <Menu className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 lg:relative",
+          "transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          !isOpen && "lg:w-64"
+        )}
+      >
+        <div
+          className={cn(
+            "h-screen flex flex-col bg-sidebar-background dark:bg-sidebar-background-dark",
+            "border-r border-gray-200 dark:border-gray-800",
+            "transition-all duration-300",
+            collapsed ? "w-20" : "w-full lg:w-64"
+          )}
+        >
+          <SidebarHeader collapsed={collapsed} />
+          {session && profile && (
+            <>
+              <SidebarNavigation collapsed={collapsed} />
+              <WorkspaceList collapsed={collapsed} />
+              <div className="flex-1" />
+              <SidebarFooter
+                collapsed={collapsed}
+                profile={profile}
+                onSignOut={handleSignOut}
+                setCollapsed={setCollapsed}
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={toggleSidebar}
+        />
       )}
-    </div>
+    </>
   );
 };
 
