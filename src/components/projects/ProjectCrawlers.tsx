@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { NewProjectCrawlerDialog } from "./NewProjectCrawlerDialog";
-import { Crawler } from "@/integrations/supabase/types";
+import { Crawler } from "@/integrations/supabase/types/crawler";
 
 interface ProjectCrawlersProps {
   projectId: string;
