@@ -101,10 +101,10 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button - Now positioned on the right */}
       <button
         onClick={toggleSidebar}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-background border border-border"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 rounded-md bg-background border border-border"
       >
         {isOpen ? (
           <X className="h-6 w-6" />
