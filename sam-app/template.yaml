@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS SAM Application that creates a Step Function to run a Device Farm desktop browser test
+
+Globals:
+  Function:
+    Timeout: 90
+    Runtime: nodejs16.x
+    MemorySize: 128
+Parameters:
+  DeviceFarmProjectArn:
+    Type: String
+    Description: ARN of the Device Farm Desktop Browser Testing project
+    Default: 'arn:aws:devicefarm:us-west-2:177607654899:testgrid-project:f7104ba2-635b-434e-b19d-f064d213fdfc'
+
+Resources:
+  DeviceFarmBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'devicefarm-artifacts-${AWS::StackName}-${AWS::Region}'
+
+  DeviceFarmTestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: ./src
+      Runtime: nodejs16.x
+      Environment:
+        Variables:
+          DEVICE_FARM_PROJECT_ARN: !Ref DeviceFarmProjectArn
+          S3_BUCKET_NAME: !Ref DeviceFarmBucket
+          DEVICE_FARM_BUCKET: !Ref DeviceFarmBucket
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: !Ref DeviceFarmBucket
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: 'Allow'
+              Action: ['devicefarm:CreateTestGridUrl', 'devicefarm:GetRun']
+              Resource: '*'
+
+  DeviceFarmStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: !Sub |
+        {
+          "StartAt": "RunDeviceFarmTest",
+          "States": {
+            "RunDeviceFarmTest": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "${DeviceFarmTestFunction}",
+                "Payload": {
+                  "seleniumScript": "$.Execution.Input.seleniumScript",
+                  "crawlUrl": "$.Execution.Input.crawlUrl",
+                  "input.$": "$"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt DeviceFarmStateMachineRole.Arn
+
+  DeviceFarmStateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DeviceFarmStateMachinePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt DeviceFarmTestFunction.Arn
+
+Outputs:
+  StateMachineArn:
+    Description: The ARN of the Step Function State Machine
+    Value: !Ref DeviceFarmStateMachine
+
+  S3BucketName:
+    Description: The name of the S3 bucket storing screenshots and artifacts
+    Value: !Ref DeviceFarmBucket

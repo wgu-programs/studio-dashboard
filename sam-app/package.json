@@ -1,0 +1,10 @@
+{
+  "name": "device-farm-test",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for running Device Farm desktop browser tests",
+  "main": "src/index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1499.0",
+    "selenium-webdriver": "^4.15.0"
+  }
+}
