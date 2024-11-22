@@ -8,6 +8,7 @@ export interface Persona {
   metadata: Json | null;
   created_at: string | null;
   workspace_id: string | null;
+  goal: string | null;
 }
 
 export interface PersonaInsert {
@@ -18,6 +19,7 @@ export interface PersonaInsert {
   metadata?: Json | null;
   created_at?: string | null;
   workspace_id?: string | null;
+  goal?: string | null;
 }
 
 export interface PersonaUpdate extends Partial<Persona> {}
