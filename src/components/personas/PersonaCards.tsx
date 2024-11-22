@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { Persona } from "@/integrations/supabase/types/personas";
 
@@ -26,23 +27,33 @@ export const PersonaCards = ({ personas }: PersonaCardsProps) => {
           className="hover:shadow-lg transition-shadow cursor-pointer"
           onClick={() => navigate(`/personas/${persona.persona_id}`)}
         >
-          <div className="aspect-video w-full overflow-hidden">
-            <img
-              src={placeholderImages[index % placeholderImages.length]}
-              alt={persona.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <CardHeader className="space-y-2">
-            <CardTitle className="text-xl">{persona.name}</CardTitle>
+          <CardHeader className="space-y-4">
+            <div className="flex items-center space-x-4">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={placeholderImages[index % placeholderImages.length]} />
+                <AvatarFallback>{persona.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div>
+                <CardTitle className="text-xl">{persona.name}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Created {formatDistanceToNow(new Date(persona.created_at || ''), { addSuffix: true })}
+                </p>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground min-h-[3rem]">
-              {persona.description || "No description"}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Created {formatDistanceToNow(new Date(persona.created_at || ''), { addSuffix: true })}
-            </p>
+            {persona.goal && (
+              <div>
+                <h3 className="font-medium text-sm">Goal</h3>
+                <p className="text-sm text-muted-foreground">{persona.goal}</p>
+              </div>
+            )}
+            {persona.description && (
+              <div>
+                <h3 className="font-medium text-sm">Description</h3>
+                <p className="text-sm text-muted-foreground">{persona.description}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}
