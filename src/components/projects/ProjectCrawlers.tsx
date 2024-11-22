@@ -12,13 +12,7 @@ import {
 } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { NewProjectCrawlerDialog } from "./NewProjectCrawlerDialog";
-
-interface Crawler {
-  crawler_id: string;
-  name: string | null;
-  status: string | null;
-  created_at: string | null;
-}
+import { Crawler } from "@/integrations/supabase/types";
 
 interface ProjectCrawlersProps {
   projectId: string;
@@ -45,7 +39,13 @@ export const ProjectCrawlers = ({ projectId }: ProjectCrawlersProps) => {
       return;
     }
 
-    setCrawlers(data || []);
+    // Ensure status is set for each crawler
+    const crawlersWithStatus = (data || []).map(crawler => ({
+      ...crawler,
+      status: crawler.status || 'unknown'
+    }));
+
+    setCrawlers(crawlersWithStatus);
   };
 
   useEffect(() => {

@@ -47,7 +47,12 @@ const RunDetails = () => {
         .eq("run_id", runId);
 
       if (error) throw error;
-      return data;
+
+      // Ensure snapshot_url is set for each page
+      return (data || []).map(page => ({
+        ...page,
+        snapshot_url: page.snapshot_url || null
+      }));
     },
     enabled: !!runId,
   });

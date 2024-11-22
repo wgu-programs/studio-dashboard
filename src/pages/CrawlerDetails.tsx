@@ -58,9 +58,15 @@ const CrawlerDetails = () => {
         return;
       }
 
-      setCrawler(crawlerData);
-      setName(crawlerData.name || "");
-      setDescription(crawlerData.description || "");
+      // Ensure status is set
+      const crawlerWithStatus = {
+        ...crawlerData,
+        status: crawlerData.status || 'unknown'
+      };
+
+      setCrawler(crawlerWithStatus);
+      setName(crawlerWithStatus.name || "");
+      setDescription(crawlerWithStatus.description || "");
 
       const { data: runsData, error: runsError } = await supabase
         .from("runs")
